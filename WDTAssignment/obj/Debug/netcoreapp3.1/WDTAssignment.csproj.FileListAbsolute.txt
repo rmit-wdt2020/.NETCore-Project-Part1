@@ -32,3 +32,6 @@ C:\Users\caeca\source\repos\WDTAssignment\WDTAssignment\bin\Debug\netcoreapp3.1\
 C:\Users\caeca\source\repos\WDTAssignment\WDTAssignment\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.0\System.Runtime.Caching.dll
 C:\Users\caeca\source\repos\WDTAssignment\WDTAssignment\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\caeca\source\repos\WDTAssignment\WDTAssignment\bin\Debug\netcoreapp3.1\SimpleHashing.dll
+C:\Users\caeca\source\repos\WDTAssignment\WDTAssignment\bin\Debug\netcoreapp3.1\System.Data.SqlClient.dll
+C:\Users\caeca\source\repos\WDTAssignment\WDTAssignment\bin\Debug\netcoreapp3.1\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Users\caeca\source\repos\WDTAssignment\WDTAssignment\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll

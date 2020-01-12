@@ -7,6 +7,10 @@ namespace WDTAssignment
     {
         static void Main(string[] args)
         {
+            // TEST JSON 
+            JSON.PopulateDatabase(); 
+             
+
             BankingSys bank = new BankingSys();
             bank.TestPopulate();
             Console.WriteLine("Welcome to National Wealth Bank of Australasia");

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WDTAssignment
 {
-    class SavingsAccount : Account
+    class SavingsAccount : Accounts
     {
       
         public SavingsAccount(int accountnumber, int customerid, double balance, double minbalance, double minopeningamt, int transactioncount)

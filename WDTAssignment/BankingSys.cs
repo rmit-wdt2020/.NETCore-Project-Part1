@@ -9,7 +9,7 @@ namespace WDTAssignment
     {
         public List<Customer> Customers = new List<Customer>();
         Customer currentCustomer;
-        List<Account> accList = new List<Account>();
+        List<Accounts> accList = new List<Accounts>();
 
         //Test method
         public void TestPopulate()
