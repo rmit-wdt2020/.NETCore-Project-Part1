@@ -25,9 +25,22 @@ namespace WDTAssignment
             DestinationAccountNumber = destinationaccountnum;
             Amount = amount;
             Comment = comment;
-            //TransactionTimeUTC = transactiontimeutc; 
+ 
             TransactionTimeUTC = DateTime.ParseExact(transactiontimeutc, "dd/MM/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture); 
         }
+        public Transactions(int transactionid, char transactiontype, int accountnumber, int destinationaccountnum, double amount, string comment)
+        {
+
+            TransactionID = transactionid;
+            TransactionType = transactiontype;
+            AccountNumber = accountnumber;
+            DestinationAccountNumber = destinationaccountnum;
+            Amount = amount;
+            Comment = comment;
+
+            //TransactionTimeUTC = DateTime.ParseExact(transactiontimeutc, "dd/MM/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture);
+        }
+
 
         public void getDetails()
         {

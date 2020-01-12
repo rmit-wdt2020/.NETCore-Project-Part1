@@ -74,6 +74,35 @@ namespace WDTAssignment
             }
         }
 
+        //FOR TESTING ONLY 
+        public static void ClearLogin()
+        {
+            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+
+            try
+            {
+                conn.Open();
+
+                //Clear Login table 
+                var deleteLogin = conn.CreateCommand();
+                deleteLogin.CommandText = "delete from login";
+                deleteLogin.ExecuteNonQuery();
+
+            }
+            catch (Exception se)
+            {
+
+                Console.WriteLine("Exception: {0}", se.Message);
+            }
+            finally
+            {
+                if (conn.State == System.Data.ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+        }
+
         public static void PopulateAccount()
         {
             using var client = new HttpClient();
@@ -84,7 +113,6 @@ namespace WDTAssignment
 
             SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
 
-            // TEST 
             foreach (var customer in customers)
             {
 
@@ -97,7 +125,7 @@ namespace WDTAssignment
 
         }
 
-        public static void InsertAccounts(Accounts accounts)
+        public static void InsertAccounts(Accounts account)
         {
             SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
 
@@ -108,10 +136,10 @@ namespace WDTAssignment
                 var populateAccounts = conn.CreateCommand();
 
                 populateAccounts.CommandText = "insert into account (AccountNumber, AccountType, CustomerID, Balance) values (@accountNumber, @accountType, @customerID, @balance)";
-                populateAccounts.Parameters.AddWithValue("accountNumber", accounts.AccountNumber);
-                populateAccounts.Parameters.AddWithValue("accountType", accounts.AccountType);
-                populateAccounts.Parameters.AddWithValue("customerID", accounts.CustomerID);
-                populateAccounts.Parameters.AddWithValue("balance", accounts.Balance);
+                populateAccounts.Parameters.AddWithValue("accountNumber", account.AccountNumber);
+                populateAccounts.Parameters.AddWithValue("accountType", account.AccountType);
+                populateAccounts.Parameters.AddWithValue("customerID", account.CustomerID);
+                populateAccounts.Parameters.AddWithValue("balance", account.Balance);
 
                 populateAccounts.ExecuteNonQuery();
 
@@ -144,14 +172,10 @@ namespace WDTAssignment
 
             foreach (var customer in customers)
             {
-                //Console.WriteLine("TEST: Looped through customers.");
                 foreach (var account in customer.Accounts)
                 {
-                    //Console.WriteLine("TEST: Looped through accounts.");
                     foreach (var transaction in account.Transactions)
                     {
-                        // Console.WriteLine("TEST: Looped through transactions.");
-                        Console.WriteLine("TEST Transaction time: " + transaction.TransactionTimeUTC);
                         InsertTransactions(transaction, account);
                         
                     }
@@ -252,8 +276,6 @@ namespace WDTAssignment
             using var client = new HttpClient();
 
             var jsonCustomers = client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/customers/").Result;
-            //var format = "dd/MM/yyyy HH:mm:ss tt";
-            //var dateTimeConverter = new IsoDateTimeConverter { DateTimeFormat = format };
             var customers = JsonConvert.DeserializeObject<List<Customer>>(jsonCustomers);
 
             foreach (var customer in customers)
@@ -265,7 +287,6 @@ namespace WDTAssignment
         public static void InsertCustomers(Customer customer)
         {
             SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
-            SqlCommand query = new SqlCommand("select * from login", conn);
 
             try
             {

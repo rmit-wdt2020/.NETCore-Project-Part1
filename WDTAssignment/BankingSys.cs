@@ -5,11 +5,14 @@ using System.Collections;
 
 namespace WDTAssignment
 {
-    class BankingSys
+     class BankingSys
     {
-        public List<Customer> Customers = new List<Customer>();
+
+        public static List<Customer> Customers { get; set; }  = new List<Customer>();       
+        public static List<Accounts> accList { get; set; } = new List<Accounts>();
+        public static List<Logins> Logins { get; set; } = new List<Logins>(); 
+
         Customer currentCustomer;
-        List<Accounts> accList = new List<Accounts>();
 
         //Test method
         public void TestPopulate()
