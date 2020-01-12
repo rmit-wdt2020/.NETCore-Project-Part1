@@ -10,31 +10,34 @@ namespace WDTAssignment
         public char TransactionType { get; set; }
         public int AccountNumber { get; set; }
         public int DestinationAccountNumber { get; set; }
-        public double Amount { get; set; }
-        public string Comment { get; set; } 
+        public string TransactionAmount { get; set; }
+        public double AccountBalance { get; set; }
+        public string Comment { get; set; }
         public DateTime TransactionTimeUTC { get; set; }
 
-        public Transaction(int transactionid, char transactiontype, int accountnumber, int destinationaccountnum, double amount, string comment, DateTime datetime)
+        public Transaction(int transactionid, char transactiontype, int accountnumber, int destinationaccountnum, string transactionamount, double accountbalance, string comment, DateTime datetime)
         {
             TransactionID = transactionid;
             TransactionType = transactiontype;
             AccountNumber = accountnumber;
             DestinationAccountNumber = destinationaccountnum;
-            Amount = amount;
+            TransactionAmount = transactionamount;
+            AccountBalance = accountbalance;
             Comment = comment;
-            TransactionTimeUTC = datetime; 
+            TransactionTimeUTC = datetime;
         }
 
         public void getDetails()
         {
             string details;
 
-            details = "\nTransaction ID: " + TransactionID +
-                      "\nTransaction Type: " + TransactionType +
-                      "\nAccount Number: " + AccountNumber +
+            details = "\nTransaction ID:             " + TransactionID +
+                      "\nTransaction Type:           " + TransactionType +
+                      "\nAccount Number:             " + AccountNumber +
                       "\nDestination Account Number: " + DestinationAccountNumber +
-                      "\nAmount: " + Amount +
-                      "\nTime & Date: " + TransactionTimeUTC;
+                      "\nTransaction Amount:         " + TransactionAmount +
+                      "\nAccount Balance:            " + AccountBalance +
+                      "\nTime & Date:                " + TransactionTimeUTC;
 
             Console.WriteLine(details);
         }

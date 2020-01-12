@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace WDTAssignment
 {
     class Program
@@ -11,7 +10,6 @@ namespace WDTAssignment
             bank.TestPopulate();
             Console.WriteLine("Welcome to National Wealth Bank of Australasia");
             bank.Login();
-
         }
     }
 }

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\caeca\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj": {}
+    "C:\\Users\\Ming\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj": {}
   },
   "projects": {
-    "C:\\Users\\caeca\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj": {
+    "C:\\Users\\Ming\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\caeca\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj",
+        "projectUniqueName": "C:\\Users\\Ming\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj",
         "projectName": "WDTAssignment",
-        "projectPath": "C:\\Users\\caeca\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj",
-        "packagesPath": "C:\\Users\\caeca\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\caeca\\source\\repos\\WDTAssignment\\WDTAssignment\\obj\\",
+        "projectPath": "C:\\Users\\Ming\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj",
+        "packagesPath": "C:\\Users\\Ming\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Ming\\source\\repos\\WDTAssignment\\WDTAssignment\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\caeca\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Ming\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -37,20 +37,6 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
-          "dependencies": {
-            "Microsoft.Data.SqlClient": {
-              "target": "Package",
-              "version": "[1.1.0, )"
-            },
-            "Newtonsoft.Json": {
-              "target": "Package",
-              "version": "[12.0.3, )"
-            },
-            "SimpleHashing": {
-              "target": "Package",
-              "version": "[1.0.3.1, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",

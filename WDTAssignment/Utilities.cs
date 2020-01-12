@@ -15,7 +15,7 @@ namespace WDTAssignment
             }
             catch (FormatException e)
             {
-                Console.WriteLine("Not valid. Please try again.");
+                Console.WriteLine("Not valid. Please try again.\n");
                 return false;
             }
         }
@@ -29,7 +29,7 @@ namespace WDTAssignment
             }
             catch (FormatException e)
             {
-                Console.WriteLine("Not valid. Please try again.");
+                Console.WriteLine("Not valid. Please try again.\n");
                 return false;
             }
         }

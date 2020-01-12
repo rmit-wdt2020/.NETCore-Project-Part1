@@ -1,8 +1,8 @@
 {
   "runtimeOptions": {
     "additionalProbingPaths": [
-      "C:\\Users\\caeca\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\caeca\\.nuget\\packages"
+      "C:\\Users\\Ming\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\Ming\\.nuget\\packages"
     ]
   }
 }

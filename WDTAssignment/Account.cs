@@ -24,7 +24,7 @@ namespace WDTAssignment
 
         }
 
-        protected Account (int accountnumber, int customerid, double balance, double minbalance, double minopeningamt, int transactioncount)
+        protected Account(int accountnumber, int customerid, double balance, double minbalance, double minopeningamt, int transactioncount)
         {
             AccountNumber = accountnumber;
             CustomerID = customerid;
@@ -34,6 +34,15 @@ namespace WDTAssignment
             TransactionCount = transactioncount;
         }
 
-        
+        public void RecordTransaction(char TransType, int DestAcc, string TransAmount)
+        {
+            if (DestAcc == 0)
+            {
+                DestAcc = AccountNumber;
+            }
+            var newTrans = new Transaction(Transactions.Count, TransType, AccountNumber, DestAcc, TransAmount, Balance, "", DateTime.MinValue);
+
+            Transactions.Add(newTrans);
+        }
     }
 }
