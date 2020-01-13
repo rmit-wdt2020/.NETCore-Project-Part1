@@ -13,9 +13,23 @@ namespace WDTAssignment
         public int DestinationAccountNumber { get; set; }
         public double Amount { get; set; }
         public string Comment { get; set; }
- 
         public DateTime TransactionTimeUTC { get; set; } 
 
+        public Transactions(int transactionid, char transactiontype, int accountnumber, int destinationaccountnum, double amount, string comment, DateTime transactiontimeutc)
+        {
+
+            TransactionID = transactionid;
+            TransactionType = transactiontype;
+            AccountNumber = accountnumber;
+            DestinationAccountNumber = destinationaccountnum;
+            Amount = amount;
+            Comment = comment;
+            TransactionTimeUTC = transactiontimeutc;
+ 
+
+        }
+
+        // Overload for string parameter which would be parsed to a DateTime object
         public Transactions(int transactionid, char transactiontype, int accountnumber, int destinationaccountnum, double amount, string comment, string transactiontimeutc)
         {
 
@@ -25,22 +39,10 @@ namespace WDTAssignment
             DestinationAccountNumber = destinationaccountnum;
             Amount = amount;
             Comment = comment;
- 
-            TransactionTimeUTC = DateTime.ParseExact(transactiontimeutc, "dd/MM/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture); 
+            TransactionTimeUTC = DateTime.Parse(transactiontimeutc);
+
+
         }
-        public Transactions(int transactionid, char transactiontype, int accountnumber, int destinationaccountnum, double amount, string comment)
-        {
-
-            TransactionID = transactionid;
-            TransactionType = transactiontype;
-            AccountNumber = accountnumber;
-            DestinationAccountNumber = destinationaccountnum;
-            Amount = amount;
-            Comment = comment;
-
-            //TransactionTimeUTC = DateTime.ParseExact(transactiontimeutc, "dd/MM/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture);
-        }
-
 
         public void getDetails()
         {

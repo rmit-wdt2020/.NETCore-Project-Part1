@@ -14,27 +14,6 @@ namespace WDTAssignment
 
         Customer currentCustomer;
 
-        //Test method
-        public void TestPopulate()
-        {
-            Customer cust1 = new Customer(0001, "password1", 0001, "Rio", "45 Clarke Street", "Southbank", "3006");
-            Customer cust2 = new Customer(0002, "Qwerty1234567", 0002, "Ming", "200 Spencer Street", "Melbourne", "3000");
-
-            // public SavingsAccount(int accountnumber, int customerid, double balance, double minbalance, double minopeningamt, List<Transaction> transactions, int transactioncount)
-
-            cust1.Accounts.Add(new SavingsAccount(4100, 0001, 100, 0, 50, 0));
-            cust1.Accounts.Add(new CheckingAccount(4101, 0001, 500, 0, 50, 0));
-
-            cust2.Accounts.Add(new SavingsAccount(4200, 0002, 900, 0, 50, 0));
-            cust2.Accounts.Add(new CheckingAccount(4201, 0002, 2500, 0, 50, 0));
-
-            Customers.Add(cust1);
-            Customers.Add(cust2);
-
-            //Account acc1 = new SavingsAccount(4100, 0001, 100, 0, 50, null, 0);
-            //Account acc2 = new CheckingAccount(4200, 0002, 100, 0, 50, null, 0);
-
-        }
         public void Login()
         {
             Console.WriteLine();

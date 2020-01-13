@@ -2,27 +2,98 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Data;
-using System.Data.SqlClient; 
+using System.Data.SqlClient;
+using System.Globalization;
 
 namespace WDTAssignment
 {
     class Database
     {
+        // Get all tables in the database and map into Objects in the program 
         public static void ImportDatabase()
         {
             DownloadLoginArray(); 
             DownloadCustomerArray();
         }
 
+        // Get all objects in the program and updates the database. NOTE: Need to clear database first. 
         public static void ExportDatabase()
         {
-            UploadCustomer();
-            UploadLoginArray();
-            UploadAccounts();
-            UploadTransactions(); 
+
+            InsertAllCustomers();
+            InsertAllLogins();
+            InsertAllAccounts();
+            InsertAllTransactions();
+        }
+
+        // NEED: Insert the last transaction in the List to the database Transaction table 
+        public static void InsertTransaction(Accounts account)
+        {
+            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+
+            try
+            {
+                conn.Open();
+
+                var insertTransaction = conn.CreateCommand();
+
+                insertTransaction.CommandText = "insert into [transaction] (TransactionType, AccountNumber, DestinationAccountNumber, Amount, Comment, TransactionTimeUTC) " +
+                                "values (@transactionType, @accountNumber, @destinationAccountNumber, @amount, @comment, @transactionTimeUTC)";
+
+                // Gets last transaction in the List 
+                insertTransaction.Parameters.AddWithValue("transactionType", account.Transactions[account.Transactions.Count - 1].TransactionType);
+                insertTransaction.Parameters.AddWithValue("accountNumber", account.Transactions[account.Transactions.Count - 1].AccountNumber);
+                insertTransaction.Parameters.AddWithValue("destinationAccountNumber", account.Transactions[account.Transactions.Count - 1].DestinationAccountNumber);
+                insertTransaction.Parameters.AddWithValue("amount", account.Transactions[account.Transactions.Count - 1].Amount);
+                insertTransaction.Parameters.AddWithValue("comment", account.Transactions[account.Transactions.Count - 1].Comment);
+                insertTransaction.Parameters.AddWithValue("transactionTimeUTC", account.Transactions[account.Transactions.Count - 1].TransactionTimeUTC);
+
+                insertTransaction.ExecuteNonQuery();
+            }
+            catch (SqlException se)
+            {
+                Console.WriteLine("Exception: {0}", se.Message);
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
         }
 
 
+        // NEED: Update the balance of the account being passed into this method 
+        public static void UpdateBalance(Accounts account)
+        {
+            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+
+            try
+            {
+                conn.Open();
+
+                var updateBalance = conn.CreateCommand();
+
+                updateBalance.CommandText = "update account set balance = " + account.Balance + " where accountnumber = " + account.AccountNumber;
+
+                updateBalance.ExecuteNonQuery();
+            }
+            catch (SqlException se)
+            {
+                Console.WriteLine("Exception: {0}", se.Message);
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+        }
+
+
+        // NEED: Method to map Login Table into Login object in the program 
         public static void DownloadLoginArray()
         {
             SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
@@ -47,12 +118,9 @@ namespace WDTAssignment
                         }
                     }
                 }
-
-
             }
             catch (SqlException se)
             {
-
                 Console.WriteLine("Exception: {0}", se.Message);
             }
             finally
@@ -62,9 +130,10 @@ namespace WDTAssignment
                     conn.Close();
                 }
             }
-
         }
 
+
+        // NEED: Method to map Customer, Account and Transaction table into corresponding objects in the program 
         public static void DownloadCustomerArray()
         {
             SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
@@ -86,7 +155,6 @@ namespace WDTAssignment
                 {
                     using (ReadCustomer = CustomerCmd.ExecuteReader())
                     {
-                        int num = 0; 
 
                         while (ReadCustomer.Read())
                         {
@@ -147,7 +215,6 @@ namespace WDTAssignment
                             }
                         }
                     }
-
                 }
 
 
@@ -156,27 +223,30 @@ namespace WDTAssignment
                     foreach(var account in customer.Accounts)
                     {
                         using (TransactionCmd = new SqlCommand("select [transactionid], [transactiontype], [accountnumber], [destinationaccountnumber]," +
-                            " [amount], [comment] [transactiontimeutc] from [transaction] where [accountnumber] = " + account.AccountNumber, conn))
+                            " [amount], [comment], [transactiontimeutc] from [transaction] where [accountnumber] = " + account.AccountNumber, conn))
                         {
                             using(ReadTransaction = TransactionCmd.ExecuteReader())
                             {
                                 while(ReadTransaction.Read())
                                 {
+                                  
+
                                     Transactions transaction = new Transactions(int.Parse(ReadTransaction["TransactionID"].ToString()), Convert.ToChar(ReadTransaction["TransactionType"].ToString()),
-                                       int.Parse(ReadTransaction["AccountNumber"].ToString()), int.Parse(ReadTransaction["DestinationAccountNumber"].ToString()), 
-                                       double.Parse(ReadTransaction["Amount"].ToString()), /*ReadTransaction["Comment"].ToString()*/null) /*ReadTransaction["TransactionTimeUTC"].ToString()*/;
+                                       int.Parse(ReadTransaction["AccountNumber"].ToString()), int.Parse(ReadTransaction["DestinationAccountNumber"].ToString()),
+                                       double.Parse(ReadTransaction["Amount"].ToString()), null, DateTime.Parse(ReadTransaction["TransactionTimeUTC"].ToString()));
+
+                                       if(ReadTransaction["Comment"] != null)
+                                    {
+                                        transaction.Comment = ReadTransaction["Comment"].ToString();
+                                    }
 
                                     account.Transactions.Add(transaction);
 
                                 }
                             }
                         }
-
-
                     }
                 }
-
-
             }
             catch (SqlException se)
             {
@@ -189,11 +259,57 @@ namespace WDTAssignment
                     conn.Close();
                 }
             }
-
-
         }
 
-        public static void UploadLoginArray()
+        // Method to push ALL Transaction objects into database 
+        public static void InsertAllTransactions()
+        {
+            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+
+            foreach (var customer in BankingSys.Customers)
+            {
+                foreach (var account in customer.Accounts)
+                {
+                    foreach (var transaction in account.Transactions)
+                    {
+                        try
+                        {
+                            conn.Open();
+
+                            var populateTransactions = conn.CreateCommand();
+
+                            populateTransactions.CommandText = "insert into [transaction] (TransactionType, AccountNumber, DestinationAccountNumber, Amount, TransactionTimeUTC) " +
+                                "values (@transactionType, @accountNumber, @destinationAccountNumber, @amount, @transactionTimeUTC)";
+                            populateTransactions.Parameters.AddWithValue("transactionType", transaction.TransactionType);
+                            populateTransactions.Parameters.AddWithValue("accountNumber", account.AccountNumber);
+                            populateTransactions.Parameters.AddWithValue("destinationAccountNumber", account.AccountNumber);
+                            populateTransactions.Parameters.AddWithValue("amount", account.Balance);
+                            populateTransactions.Parameters.AddWithValue("transactionTimeUTC", transaction.TransactionTimeUTC);
+
+
+                            populateTransactions.ExecuteNonQuery();
+
+                        }
+                        catch (SqlException se)
+                        {
+                            Console.WriteLine("Exception: {0}", se.Message);
+                        }
+                        finally
+                        {
+                            if (conn.State == System.Data.ConnectionState.Open)
+                            {
+                                conn.Close();
+                            }
+                        }
+
+                    }
+                }
+
+            }
+        }
+
+        // Method to push ALL Login objects into database 
+        public static void InsertAllLogins()
         {
             SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
 
@@ -227,8 +343,8 @@ namespace WDTAssignment
             }
         }
 
-
-        public static void UploadCustomer()
+        // Method to push ALL Customer objects into database 
+        public static void InsertAllCustomers()
         {
             SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
 
@@ -291,7 +407,8 @@ namespace WDTAssignment
             }
         }
 
-        public static void UploadAccounts()
+        // Method to push ALL Account objects into database 
+        public static void InsertAllAccounts()
         {
             SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
 
@@ -333,57 +450,5 @@ namespace WDTAssignment
             }
 
         }
-
-
-        public static void UploadTransactions()
-        {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
-
-            foreach (var customer in BankingSys.Customers)
-            {
-                foreach (var account in customer.Accounts)
-                {
-                    foreach (var transaction in account.Transactions)
-                    {
-                        try
-                        {
-                            conn.Open();
-
-                            var populateTransactions = conn.CreateCommand();
-
-                            populateTransactions.CommandText = "insert into [transaction] (TransactionType, AccountNumber, DestinationAccountNumber, Amount, TransactionTimeUTC) " +
-                                "values (@transactionType, @accountNumber, @destinationAccountNumber, @amount, @transactionTimeUTC)";
-                            populateTransactions.Parameters.AddWithValue("transactionType", transaction.TransactionType);
-                            populateTransactions.Parameters.AddWithValue("accountNumber", account.AccountNumber);
-                            populateTransactions.Parameters.AddWithValue("destinationAccountNumber", account.AccountNumber);
-                            populateTransactions.Parameters.AddWithValue("amount", account.Balance);
-                            populateTransactions.Parameters.AddWithValue("transactionTimeUTC", transaction.TransactionTimeUTC);
-
-
-                            populateTransactions.ExecuteNonQuery();
-
-                        }
-                        catch (SqlException se)
-                        {
-                            Console.WriteLine("Exception: {0}", se.Message);
-                        }
-                        finally
-                        {
-                            if (conn.State == System.Data.ConnectionState.Open)
-                            {
-                                conn.Close();
-                            }
-                        }
-
-                    }
-                }
-
-            }
-        }
-
     }
-
-
-
-
 }
