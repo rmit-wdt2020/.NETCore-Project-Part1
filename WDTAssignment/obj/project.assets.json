@@ -4611,11 +4611,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\caeca\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj",
+      "projectUniqueName": "C:\\Users\\caeca\\Desktop\\a1-s3739706-s3711914-ming-branch\\WDTAssignment\\WDTAssignment.csproj",
       "projectName": "WDTAssignment",
-      "projectPath": "C:\\Users\\caeca\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj",
+      "projectPath": "C:\\Users\\caeca\\Desktop\\a1-s3739706-s3711914-ming-branch\\WDTAssignment\\WDTAssignment.csproj",
       "packagesPath": "C:\\Users\\caeca\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\caeca\\source\\repos\\WDTAssignment\\WDTAssignment\\obj\\",
+      "outputPath": "C:\\Users\\caeca\\Desktop\\a1-s3739706-s3711914-ming-branch\\WDTAssignment\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\caeca\\AppData\\Roaming\\NuGet\\NuGet.Config",

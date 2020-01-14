@@ -2,36 +2,51 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
+using SimpleHashing;
 
 namespace WDTAssignment
 {
     class BankingSys
     {
-        public List<Customer> Customers = new List<Customer>();
+        public Database db { get; set; } = new Database();
+        public static List<Customer> Customers { get; set; } = new List<Customer>();
+        public static List<Logins> Logins { get; set; } = new List<Logins>();
         Customer currentCustomer;
-        List<Account> accList = new List<Account>();
 
         //Test method
-        public void TestPopulate()
-        {
-            Customer cust1 = new Customer(0001, "password1", 0001, "Rio", "45 Clarke Street", "Southbank", "3006");
-            Customer cust2 = new Customer(0002, "Qwerty1234567", 0002, "Ming", "200 Spencer Street", "Melbourne", "3000");
+        //public void TestPopulate()
+        //{
+        //    Customer cust1 = new Customer(0001, "password1", 0001, "Rio", "45 Clarke Street", "Southbank", "3006");
+        //    Customer cust2 = new Customer(0002, "Qwerty1234567", 0002, "Ming", "200 Spencer Street", "Melbourne", "3000");
 
-            // public SavingsAccount(int accountnumber, int customerid, double balance, double minbalance, double minopeningamt, List<Transaction> transactions, int transactioncount)
+        //    cust1.Accounts.Add(new SavingsAccount(4100, 0001, 100, 0, 50, 0));
+        //    cust1.Accounts.Add(new CheckingAccount(4101, 0001, 500, 0, 50, 0));
 
-            cust1.Accounts.Add(new SavingsAccount(4100, 0001, 100, 0, 50, 0));
-            cust1.Accounts.Add(new CheckingAccount(4101, 0001, 500, 0, 50, 0));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(1, 'D', 4100, 4100, 100, "", DateTime.MinValue));
+        //    cust1.Accounts[1].Transactions.Add(new Transaction(1, 'D', 4101, 4101, 500, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(2, 'D', 4100, 4100, 100, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(3, 'D', 4100, 4100, 200, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(4, 'D', 4101, 4101, 300, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(5, 'D', 4101, 4101, 400, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(6, 'D', 4101, 4101, 500, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(7, 'D', 4101, 4101, 600, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(8, 'D', 4101, 4101, 700, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(9, 'D', 4101, 4101, 800, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(10, 'D', 4101, 4101, 900, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(11, 'D', 4101, 4101, 1000, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(12, 'D', 4101, 4101, 1100, "", DateTime.MinValue));
+        //    cust1.Accounts[0].Transactions.Add(new Transaction(13, 'D', 4101, 4101, 1200, "", DateTime.MinValue));
 
-            cust2.Accounts.Add(new SavingsAccount(4200, 0002, 900, 0, 50, 0));
-            cust2.Accounts.Add(new CheckingAccount(4201, 0002, 2500, 0, 50, 0));
+        //    cust2.Accounts.Add(new SavingsAccount(4200, 0002, 900, 0, 50, 0));
+        //    cust2.Accounts.Add(new CheckingAccount(4201, 0002, 2500, 0, 50, 0));
 
-            Customers.Add(cust1);
-            Customers.Add(cust2);
+        //    cust2.Accounts[0].Transactions.Add(new Transaction(1, 'D', 4200, 4200, 900, "", DateTime.MinValue));
+        //    cust2.Accounts[1].Transactions.Add(new Transaction(1, 'D', 4201, 4201, 2500, "", DateTime.MinValue));
 
-            //Account acc1 = new SavingsAccount(4100, 0001, 100, 0, 50, null, 0);
-            //Account acc2 = new CheckingAccount(4200, 0002, 100, 0, 50, null, 0);
+        //    Customers.Add(cust1);
+        //    Customers.Add(cust2);
 
-        }
+        //}
         public void Login()
         {
             Console.WriteLine();
@@ -39,7 +54,7 @@ namespace WDTAssignment
             //var login = int.Parse(Console.ReadLine());
             var tempString = Console.ReadLine();
 
-            if(Utilities.IsItAnInt(tempString))
+            if (Utilities.IsItAnInt(tempString))
             {
                 var login = int.Parse(tempString);
                 Validate(login);
@@ -50,6 +65,8 @@ namespace WDTAssignment
             }
         }
 
+        // pull password from login table
+        // using simple hashing to compare passwords for validation
         public void Validate(int login)
         {
             foreach (var customer in Customers)
@@ -84,6 +101,7 @@ namespace WDTAssignment
 
         public void MainMenu()
         {
+            Console.Clear();
             while (true)
             {
                 Console.WriteLine("\n***** National Wealth Bank of Australasia System Menu ******");
@@ -95,8 +113,8 @@ namespace WDTAssignment
                 Console.Write("Please enter your choice: ");
 
                 var tempString = Console.ReadLine();
-                    
-                if(Utilities.IsItAnInt(tempString))
+
+                if (Utilities.IsItAnInt(tempString))
                 {
                     var option = int.Parse(tempString);
                     MenuChoice(option);
@@ -117,7 +135,10 @@ namespace WDTAssignment
                     break;
 
                 case 2:
-                    AccountTransferMenu();
+                    if (TransferConfirmation() == true)
+                    {
+                        AccountTransferMenu();
+                    }
                     break;
 
                 case 3:
@@ -140,7 +161,7 @@ namespace WDTAssignment
 
         public void ATMMenu()
         {
-            while(true)
+            while (true)
             {
                 Console.Write("\n***** ATM Menu *****\n" +
                     "Deposit               1\n" +
@@ -149,7 +170,7 @@ namespace WDTAssignment
                     "Please enter your choice: ");
 
                 var option = Console.ReadLine();
-                if(Utilities.IsItAnInt(option) == true)
+                if (Utilities.IsItAnInt(option) == true)
                 {
                     ATMChoice(int.Parse(option));
                 }
@@ -164,8 +185,10 @@ namespace WDTAssignment
                     Deposit();
                     break;
                 case 2:
+                    Withdraw();
                     break;
                 case 9:
+                    Console.WriteLine("Returning to main menu.\n");
                     MainMenu();
                     break;
                 default:
@@ -198,16 +221,19 @@ namespace WDTAssignment
             switch (option)
             {
                 case 1:
+                    TransferOwn();
                     break;
                 case 2:
+                    TransferThirdParty();
                     break;
                 case 9:
+                    Console.WriteLine("Returning to main menu.\n");
                     MainMenu();
                     break;
                 default:
                     Console.WriteLine("Invalid option. Please try again");
                     AccountTransferMenu();
-                        break;
+                    break;
             }
         }
 
@@ -215,23 +241,15 @@ namespace WDTAssignment
         {
             Console.WriteLine("\n***** Statement Menu *****\n" +
                 "Which account do you want to view?");
-            ListAccounts();
+            ListAccountsOptions();
 
             Console.Write("\nPlease enter your choice: ");
             var choice = Console.ReadLine();
 
-            if(Utilities.IsItAnInt(choice) == true)
+            if (Utilities.IsItAnInt(choice) == true)
             {
                 int AccountChoice = int.Parse(choice) - 1;
-                // 4 transactions per page
-                int transactionCount = 1;
-                foreach (var transaction in currentCustomer.Accounts[AccountChoice].Transactions)
-                {
-                    Console.WriteLine("Transaction " + transactionCount + "\n");
-                    transaction.getDetails();
-                    transactionCount++;
-                    Console.WriteLine();
-                }
+                ViewStatement(AccountChoice);
             }
         }
 
@@ -241,6 +259,7 @@ namespace WDTAssignment
             Login();
         }
 
+        // see if can close console window
         public void Exit()
         {
             Console.Clear();
@@ -252,50 +271,436 @@ namespace WDTAssignment
 
         public void Deposit()
         {
-            int AccountChoice = 0;
+            int accountChoice = 0;
 
             Console.WriteLine("\nWhich account would you like to deposit to?");
-            //have to do checking for error
-            ListAccounts();
+            ListAccountsOptions();
             Console.Write("\nPlease enter your choice: ");
             var choice = Console.ReadLine();
 
-            if(Utilities.IsItAnInt(choice) == true)
+            if (Utilities.IsItAnInt(choice) == true && int.Parse(choice) <= currentCustomer.Accounts.Count)
             {
-                AccountChoice = int.Parse(choice) - 1;
+                accountChoice = int.Parse(choice) - 1;
+                Account chosenAccount = currentCustomer.Accounts[accountChoice];
                 Console.Write("\n\nHow much do you wish to deposit: $");
                 string tempDouble = Console.ReadLine();
 
                 if (Utilities.IsItADouble(tempDouble) == true)
                 {
                     var depositAmount = double.Parse(tempDouble);
-                    currentCustomer.Accounts[AccountChoice].Balance += depositAmount;
-                    Console.WriteLine("Account balance: $" + currentCustomer.Accounts[AccountChoice].Balance);
+                    chosenAccount.Balance += depositAmount;
+                    Console.WriteLine("\n\nDepositing $" + depositAmount + " into account no. " + chosenAccount.AccountNumber + ".\n" +
+                        "Account balance: $" + chosenAccount.Balance + "\n");
+
+                    chosenAccount.RecordTransaction(0, 'D', 0, depositAmount);
+                    updateDB(chosenAccount);
                 }
                 else
                 {
                     Deposit();
                 }
             }
+            else
+            {
+                Console.WriteLine("Not a valid option. Please try again.");
+                Deposit();
+            }
+        }
+
+        public void Withdraw()
+        {
+            while (WithdrawConfirmation() == true)
+            {
+                int accountChoice = 0;
+
+                Console.WriteLine("\nWhich account would you like to withdraw from?");
+                ListAccountsOptions();
+                Console.Write("\nPlease enter your choice: ");
+                var choice = Console.ReadLine();
+
+                if (Utilities.IsItAnInt(choice) == true && int.Parse(choice) <= currentCustomer.Accounts.Count)
+                {
+                    accountChoice = int.Parse(choice) - 1;
+                    Account chosenAccount = currentCustomer.Accounts[accountChoice];
+                    WithdrawMoney(chosenAccount);
+                    updateDB(chosenAccount);
+                }
+                else
+                {
+                    Console.WriteLine("Not a valid option. Please try again.");
+                    Withdraw();
+                }
+            }
+        }
+
+        public void WithdrawMoney(Account chosenAccount)
+        {
+            Console.Write("\n\nHow much do you wish to withdraw: $");
+            string tempDouble = Console.ReadLine();
+
+            if (Utilities.IsItADouble(tempDouble) == true)
+            {
+                var withdrawalAmount = double.Parse(tempDouble);
+
+                if (withdrawalAmount <= (chosenAccount.Balance - 0.1))
+                {
+                    Console.WriteLine("\nWithdrawing $" + withdrawalAmount + " from account no. " + chosenAccount.AccountNumber + ".\n" +
+                        "Cost of withdrawal will be $0.10, and will be deducted from account no. " + chosenAccount.AccountNumber + ".\n");
+
+                    var deficit = (withdrawalAmount + 0.1);
+                    chosenAccount.Balance -= deficit;
+                    chosenAccount.RecordTransaction(0, 'D', 0, deficit);
+                    Console.WriteLine("Account balance: $" + chosenAccount.Balance);
+                    updateDB(chosenAccount);
+
+                    Console.WriteLine("Returning to main menu.\n\n");
+                }
+                else
+                {
+                    Console.WriteLine("You cannot withdraw more than the balance in your account, which is $" + chosenAccount.Balance + ", not including the $0.10 withdrawal fee.\n" +
+                        "Please try again.");
+                    WithdrawMoney(chosenAccount);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Not a valid option. Please try again.");
+                Withdraw();
+            }
+        }
+
+        public Boolean WithdrawConfirmation()
+        {
+            var confirm = false;
+            Console.Write("\nWithdrawing from accounts will cost $0.10 cents.\n" +
+                "Do you agree to these terms? (y/n): ");
+            var response = Console.ReadLine();
+
+            if (response.ToLower().CompareTo("y") == 0)
+            {
+                confirm = true;
+            }
+            else if (response.ToLower().CompareTo("n") == 0)
+            {
+                Console.WriteLine("\nYou do not agree to these terms.\n" +
+                    "Returning to Main Menu.\n");
+                return confirm;
+            }
+            else
+            {
+                Console.WriteLine("\nNot a valid option. Please try again.");
+                WithdrawConfirmation();
+            }
+            return confirm;
+        }
+
+        public void TransferOwn()
+        {
+            if (currentCustomer.Accounts.Count < 2)
+            {
+                Console.WriteLine("You cannot transfer from your own account as you only have 1 account.\n" +
+                    "Please try again.");
+                AccountTransferMenu();
+            }
+            else
+            {
+                Console.WriteLine("\nWhich account would you like to transfer from?");
+                ListAccountsOptions();
+                Console.Write("\nPlease enter your choice: ");
+                var choice = Console.ReadLine();
+
+                if (Utilities.IsItAnInt(choice) == true && int.Parse(choice) <= currentCustomer.Accounts.Count)
+                {
+                    int accountChoice = int.Parse(choice) - 1;
+                    Account chosenAccount = currentCustomer.Accounts[accountChoice];
+                    Account destAccount = currentCustomer.Accounts[(accountChoice + 1) % 2];
+                    Console.Write("\n\nTransfer from account no. " + chosenAccount.AccountNumber + " to account no. " + destAccount.AccountNumber + "? (y/n): ");
+                    var response = Console.ReadLine();
+
+                    if (response.ToLower().CompareTo("y") == 0)
+                    {
+                        TransferMoney(chosenAccount, destAccount);
+                    }
+                    else if (response.ToLower().CompareTo("n") == 0)
+                    {
+                        Console.WriteLine("\nYou did not agree to the terms.\nReturning to main menu.\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Not a valid option. Please try again.\n");
+                        TransferOwn();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Not a valid option. Please try again.\n");
+                    TransferOwn();
+                }
+            }
+        }
+
+        public void TransferThirdParty()
+        {
+            Console.WriteLine("\nWhich account would you like to transfer from?");
+            ListAccountsOptions();
+            Console.Write("\nPlease enter your choice: ");
+            var choice = Console.ReadLine();
+
+            if (Utilities.IsItAnInt(choice) == true)
+            {
+                int accountChoice = int.Parse(choice) - 1;
+                Account chosenAccount = currentCustomer.Accounts[accountChoice];
+                Console.Write("\nPlease enter the account you would like to transfer to: ");
+                var tempDestAcc = Console.ReadLine();
+
+                if (Utilities.IsItAnInt(tempDestAcc) == true)
+                {
+                    var DestAccNo = int.Parse(tempDestAcc);
+
+
+                    Boolean accountFound = false;
+
+                    for (int i = 0; i < Customers.Count; i++)
+                    {
+                        for (int j = 0; j < Customers[i].Accounts.Count; j++)
+                        {
+                            if (Customers[i].Accounts[j].AccountNumber == DestAccNo)
+                            {
+                                accountFound = true;
+                                Account destAccount = Customers[i].Accounts[j];
+                                TransferMoney(chosenAccount, destAccount);
+                            }
+                        }
+                    }
+
+                    if (!accountFound)
+                    {
+                        Console.WriteLine("No such account exists. Returning to main menu.\n");
+                    }
+                }
+            }
+        }
+
+        public void TransferMoney(Account chosenAccount, Account destAccount)
+        {
+            Console.Write("\n\nHow much would you like to transfer: $");
+            string tempDouble = Console.ReadLine();
+
+            if (Utilities.IsItADouble(tempDouble) == true)
+            {
+                var transferAmount = double.Parse(tempDouble);
+
+                if (transferAmount <= (chosenAccount.Balance - 0.2))
+                {
+                    Console.WriteLine("\nTransferring $" + transferAmount + " from account no. " + chosenAccount.AccountNumber + " to account no. " + destAccount.AccountNumber + ".\n" +
+                        "Cost of transfer will be $0.20, and will be deducted from account no. " + chosenAccount.AccountNumber + ".\n");
+
+                    ListAccounts();
+
+                    Console.WriteLine("\n\nTransferring money now.\n");
+
+                    var deficit = (transferAmount + 0.2);
+                    chosenAccount.Balance -= deficit;
+                    destAccount.Balance += transferAmount;
+
+                    chosenAccount.RecordTransaction(0, 'T', destAccount.AccountNumber, deficit);
+                    destAccount.RecordTransaction(0, 'T', chosenAccount.AccountNumber, transferAmount);
+                    updateDB(chosenAccount);
+                    updateDB(destAccount);
+
+                    Console.WriteLine("Tranfer complete.\n");
+                    ListAccounts();
+                    Console.WriteLine();
+                }
+                else
+                {
+                    Console.WriteLine("\nYou cannot transfer more than the balance in your account, which is $" + chosenAccount.Balance + ", not including the $0.20 tranfer fee.\n" +
+                        "Please Try Again.");
+                    TransferMoney(chosenAccount, destAccount);
+                }
+            }
+        }
+
+        public Boolean TransferConfirmation()
+        {
+            var confirm = false;
+            Console.Write("\nTransferring between accounts will cost $0.20 cents.\n" +
+                "Do you agree to these terms? (y/n): ");
+            var response = Console.ReadLine();
+
+            if (response.ToLower().CompareTo("y") == 0)
+            {
+                confirm = true;
+            }
+            else if (response.ToLower().CompareTo("n") == 0)
+            {
+                Console.WriteLine("\nYou did not agree to these terms.\n" +
+                    "Returning to Main Menu.\n");
+                return confirm;
+            }
+            else
+            {
+                Console.WriteLine("\nNot a valid option. Please try again.\n");
+                TransferConfirmation();
+            }
+            return confirm;
+        }
+
+        public void ViewStatement(int accountChoice)
+        {
+            var chosenAccount = currentCustomer.Accounts[accountChoice];
+            var transList = chosenAccount.Transactions;
+            var totalTransactions = chosenAccount.Transactions.Count;
+            double temp = totalTransactions / 4;
+            int totalPages = (int)Math.Round(temp) * 4;
+            int currentPrintedTransNo = 1;
+
+            printStatementFirstPage(totalPages, totalTransactions, transList, currentPrintedTransNo);
+        }
+
+        public void printTransaction(List<Transaction> list, int currentPrintedTransNo, int i)
+        {
+            Console.WriteLine("\nTransaction " + currentPrintedTransNo);
+            list[i].getDetails();
+            Console.WriteLine("\n----------------------------------------");
+        }
+
+        public void printStatementFirstPage(int totalPages, int totalTrans, List<Transaction> list, int currentPrintedTransNo)
+        {
+            var printedTransCount = 0;
+            var currentPage = 1;
+
+            Console.WriteLine("\n\nPage No. " + currentPage);
+            for (int i = (totalTrans - 1); i >= 0; i--)
+            {
+                printTransaction(list, currentPrintedTransNo, i);
+                currentPrintedTransNo++;
+                printedTransCount++;
+
+                if(printedTransCount == 4)
+                {
+                    break;
+                }
+            }
+            printStatementPageEndChoice(currentPage, totalPages, totalTrans, list, currentPrintedTransNo);
+        }
+
+        public void printStatementNextCalledPage(int currentPage, int totalPages, int totalTrans, List<Transaction> list, int currentPrintedTransNo)
+        {
+            var printedTransCount = 0;
+            
+            Console.WriteLine("\n\nPage No. " + currentPage);
+            for(int i = (totalTrans - currentPrintedTransNo); i >= 0; i--)
+            {
+                var id = list[i].TransactionID;
+                printTransaction(list, currentPrintedTransNo, i);
+                currentPrintedTransNo++;
+                printedTransCount++;
+
+                if (printedTransCount == 4)
+                {
+                    break;
+                }
+            }
+            printStatementPageEndChoice(currentPage, totalPages, totalTrans, list, currentPrintedTransNo);
+        }
+
+        public void printStatementPageEndChoice(int currentPage, int totalPages, int totalTrans, List<Transaction> list, int currentPrintedTransNo)
+        {
+            if (totalPages == 1)
+            {
+                Console.WriteLine("Returning to main menu.\n");
+            }
+            else if (currentPage == 1 && totalPages > 1)
+            {
+                Console.WriteLine("Main Menu (m)\t\tNext Page (n)");
+            }
+            else if (currentPage >= 2 && currentPage < totalPages)
+            {
+                Console.WriteLine("Previous Page (p)\t\tMain Menu (m)\t\tNext Page (n)");
+            }
+            else if (currentPage >= 2 && currentPage == totalPages)
+            {
+                Console.WriteLine("Previous Page (p)\t\tMain Menu (m)");
+            }
+            string response = Console.ReadLine();
+
+            while (response.ToLower() != "m")
+            {
+                if(response.ToLower() == "n")
+                {
+                    currentPage++;
+                    printStatementNextCalledPage(currentPage, totalPages, totalTrans, list, currentPrintedTransNo);
+                }
+                else if(response.ToLower() == "p")
+                {
+                    currentPage -= 1;
+                    currentPrintedTransNo -= 8; // this will have array out of bounds
+
+                    printStatementNextCalledPage(currentPage, totalPages, totalTrans, list, currentPrintedTransNo);
+                } 
+                else
+                {
+                    Console.WriteLine("\nInvalid option. Returning to main menu.\n");
+                    MainMenu();
+                }
+            }
+            if (response.ToLower() == "m")
+            {
+                Console.WriteLine("Returning to main menu.\n");
+                return;
+            }
+        }
+
+        public void ListAccountsOptions()
+        {
+            var accountCount = 1;
+            Console.WriteLine("----------------------------------------------------\n" +
+                              "| ACCOUNT NUMBER | ACCOUNT TYPE | BALANCE | OPTION |\n" +
+                              "----------------------------------------------------");
+            foreach (var account in currentCustomer.Accounts)
+            {
+                Console.Write("  " + account.AccountNumber + "\t\t   ");
+                if (account.AccountType == 'S')
+                {
+                    Console.Write("Savings\t  ");
+                }
+                else
+                {
+                    Console.Write("Checking\t  ");
+                }
+                Console.WriteLine("$" + account.Balance + "\t    " + accountCount);
+                accountCount++;
+            }
         }
 
         public void ListAccounts()
         {
-            var AccountCount = 1;
+            var accountCount = 1;
+            Console.WriteLine("-------------------------------------------\n" +
+                              "| ACCOUNT NUMBER | ACCOUNT TYPE | BALANCE |\n" +
+                              "-------------------------------------------");
             foreach (var account in currentCustomer.Accounts)
             {
-                Console.Write(account.AccountNumber + "\t");
+                Console.Write("  " + account.AccountNumber + "\t\t   ");
                 if (account.AccountType == 'S')
                 {
-                    Console.Write("Savings\t\t");
+                    Console.Write("Savings\t  ");
                 }
                 else
                 {
-                    Console.Write("Checking\t");
+                    Console.Write("Checking\t  ");
                 }
-                Console.WriteLine(AccountCount);
-                AccountCount++;
+                Console.WriteLine("$" + account.Balance);
+                accountCount++;
             }
+        }
+
+        public void updateDB(Account chosenAccount)
+        {
+            db.InsertTransaction(chosenAccount);
+            db.UpdateBalance(chosenAccount);
+            chosenAccount.Transactions[(chosenAccount.Transactions.Count - 1)].TransactionID = db.GetTransactionID();
         }
     }
 }
