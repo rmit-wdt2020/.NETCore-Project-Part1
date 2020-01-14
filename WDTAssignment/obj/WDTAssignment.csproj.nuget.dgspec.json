@@ -37,6 +37,20 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
+          "dependencies": {
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[1.1.0, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            },
+            "SimpleHashing": {
+              "target": "Package",
+              "version": "[1.0.3.1, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
