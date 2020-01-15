@@ -4,11 +4,12 @@ using System.Text;
 
 namespace WDTAssignment
 {
-    abstract class Account
+    // Account class not abstract as could not deserialize abstract classes
+    class Account
     {
         public int AccountNumber { get; set; }
         public char AccountType { get; set; }
-        protected int CustomerID { get; set; }
+        public int CustomerID { get; set; }
         public double Balance { get; set; }
         protected double MinBalance { get; set; }
         protected double MinOpeningAmt { get; set; }
@@ -34,13 +35,13 @@ namespace WDTAssignment
             TransactionCount = transactioncount;
         }
 
-        public void RecordTransaction(char TransType, int DestAcc, string TransAmount)
+        public void RecordTransaction(int transactionID, char transType, int destAcc, double transAmount)
         {
-            if (DestAcc == 0)
+            if (destAcc == 0)
             {
-                DestAcc = AccountNumber;
+                destAcc = AccountNumber;
             }
-            var newTrans = new Transaction(Transactions.Count, TransType, AccountNumber, DestAcc, TransAmount, Balance, "", DateTime.MinValue);
+            var newTrans = new Transaction(transactionID, transType, AccountNumber, destAcc, transAmount, "", DateTime.UtcNow);
 
             Transactions.Add(newTrans);
         }

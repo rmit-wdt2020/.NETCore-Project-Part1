@@ -13,7 +13,7 @@ namespace WDTAssignment
         public string Address { get; set; }
         public string City { get; set; }
         public string PostCode { get; set; }
-        public List<Account> Accounts = new List<Account>();
+        public List<Account> Accounts { get; set; }  = new List<Account>();
 
         public Customer(int login, string pw, int id, string name, string address, string city, string postcode)
         {
@@ -24,9 +24,7 @@ namespace WDTAssignment
             Address = address;
             City = city;
             PostCode = postcode;
-            PostCode = postcode;
+            Accounts.Capacity = 2;
         }
-
-
     }
 }

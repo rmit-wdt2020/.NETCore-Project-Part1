@@ -8,55 +8,22 @@ namespace WDTAssignment
 {
     class BankingSys
     {
-        public List<Customer> Customers = new List<Customer>();
+        public Database db { get; set; } = new Database();
+        public static List<Customer> Customers { get; set; } = new List<Customer>();
+        public static List<Logins> Logins { get; set; } = new List<Logins>();
         Customer currentCustomer;
-        List<Account> accList = new List<Account>();
 
-        //Test method
-        public void TestPopulate()
-        {
-            Customer cust1 = new Customer(0001, "password1", 0001, "Rio", "45 Clarke Street", "Southbank", "3006");
-            Customer cust2 = new Customer(0002, "Qwerty1234567", 0002, "Ming", "200 Spencer Street", "Melbourne", "3000");
-
-            cust1.Accounts.Add(new SavingsAccount(4100, 0001, 100, 0, 50, 0));
-            cust1.Accounts.Add(new CheckingAccount(4101, 0001, 500, 0, 50, 0));
-
-            cust1.Accounts[0].Transactions.Add(new Transaction(1, 'D', 4100, 4100, "+ 100", 100, "", DateTime.MinValue));
-            cust1.Accounts[1].Transactions.Add(new Transaction(1, 'D', 4101, 4101, "+ 500", 500, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(2, 'D', 4100, 4100, "+ 100", 100, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(3, 'D', 4100, 4100, "+ 200", 200, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(4, 'D', 4101, 4101, "+ 300", 300, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(5, 'D', 4101, 4101, "+ 400", 400, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(6, 'D', 4101, 4101, "+ 500", 500, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(7, 'D', 4101, 4101, "+ 600", 600, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(8, 'D', 4101, 4101, "+ 700", 700, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(9, 'D', 4101, 4101, "+ 800", 800, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(10, 'D', 4101, 4101, "+ 900", 900, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(11, 'D', 4101, 4101, "+ 1000", 1000, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(12, 'D', 4101, 4101, "+ 1100", 1100, "", DateTime.MinValue));
-            cust1.Accounts[0].Transactions.Add(new Transaction(13, 'D', 4101, 4101, "+ 1200", 1200, "", DateTime.MinValue));
-
-            cust2.Accounts.Add(new SavingsAccount(4200, 0002, 900, 0, 50, 0));
-            cust2.Accounts.Add(new CheckingAccount(4201, 0002, 2500, 0, 50, 0));
-
-            cust2.Accounts[0].Transactions.Add(new Transaction(1, 'D', 4200, 4200, "+ 900", 900, "", DateTime.MinValue));
-            cust2.Accounts[1].Transactions.Add(new Transaction(1, 'D', 4201, 4201, "+ 2500", 2500, "", DateTime.MinValue));
-
-            Customers.Add(cust1);
-            Customers.Add(cust2);
-
-        }
         public void Login()
         {
             Console.WriteLine();
             Console.Write("LoginID: ");
-            //var login = int.Parse(Console.ReadLine());
-            var tempString = Console.ReadLine();
+            //var tempString = Console.ReadLine();
+            var tempString = "12345678";
 
             if (Utilities.IsItAnInt(tempString))
             {
-                var login = int.Parse(tempString);
-                Validate(login);
+                var loginID = int.Parse(tempString);
+                Validate(loginID);
             }
             else
             {
@@ -75,7 +42,8 @@ namespace WDTAssignment
                         string password;
                         Console.WriteLine("\nEnter your password,\n" +
                             "or 'b' to return to previous screen): ");
-                        password = Console.ReadLine();
+                        //password = Console.ReadLine();
+                        password = "abc123";
 
                         if ("b".CompareTo(password.ToLower()) == 0)
                         {
@@ -83,7 +51,7 @@ namespace WDTAssignment
                             Login();
                         }
 
-                        if (password.CompareTo(customer.Password) == 0)
+                        if (PBKDF2.Verify(customer.Password, password) == true)
                         {
                             currentCustomer = customer;
                             MainMenu();
@@ -98,16 +66,16 @@ namespace WDTAssignment
 
         public void MainMenu()
         {
+            Console.Clear();
             while (true)
             {
-                Console.WriteLine("\n***** National Wealth Bank of Australasia System Menu ******");
-                Console.WriteLine("ATM:                            1");
-                Console.WriteLine("Account Transfer:               2");
-                Console.WriteLine("View Statement:                 3");
-                Console.WriteLine("Logout:                         9");
-                Console.WriteLine("Exit:                           0");
-                Console.Write("Please enter your choice: ");
-
+                Console.Write("\n***** National Wealth Bank of Australasia System Menu ******\n" +
+                                "ATM:                            1\n" +
+                                "Account Transfer:               2\n" +
+                                "View Statement:                 3\n" +
+                                "Logout:                         9\n" +
+                                "Exit:                           0\n" +
+                                "Please enter your choice: ");
                 var tempString = Console.ReadLine();
 
                 if (Utilities.IsItAnInt(tempString))
@@ -133,12 +101,13 @@ namespace WDTAssignment
                 case 2:
                     if (TransferConfirmation() == true)
                     {
+                        Console.Clear();
                         AccountTransferMenu();
-
                     }
                     break;
 
                 case 3:
+                    Console.Clear();
                     StatementMenu();
                     break;
 
@@ -215,6 +184,7 @@ namespace WDTAssignment
 
         public void TransferChoice(int option)
         {
+            Console.Clear();
             switch (option)
             {
                 case 1:
@@ -224,7 +194,6 @@ namespace WDTAssignment
                     TransferThirdParty();
                     break;
                 case 9:
-                    Console.WriteLine("Returning to main menu.\n");
                     MainMenu();
                     break;
                 default:
@@ -240,13 +209,23 @@ namespace WDTAssignment
                 "Which account do you want to view?");
             ListAccountsOptions();
 
-            Console.Write("\nPlease enter your choice: ");
+            Console.Write("\nPlease enter your choice, or enter 'c' to cancel: ");
             var choice = Console.ReadLine();
 
-            if (Utilities.IsItAnInt(choice) == true)
+            if(choice.ToLower() == "c")
+            {
+                Console.Clear();
+                return;
+            }
+            else if (Utilities.IsItAnInt(choice) == true && int.Parse(choice) <= currentCustomer.Accounts.Count)
             {
                 int AccountChoice = int.Parse(choice) - 1;
                 ViewStatement(AccountChoice);
+            }
+            else
+            {
+                Console.WriteLine("Not a valid option. Please try again.\n");
+                StatementMenu();
             }
         }
 
@@ -256,6 +235,7 @@ namespace WDTAssignment
             Login();
         }
 
+        // see if can close console window
         public void Exit()
         {
             Console.Clear();
@@ -267,14 +247,20 @@ namespace WDTAssignment
 
         public void Deposit()
         {
-            int accountChoice = 0;
+            int accountChoice;
 
+            Console.Clear();
             Console.WriteLine("\nWhich account would you like to deposit to?");
             ListAccountsOptions();
-            Console.Write("\nPlease enter your choice: ");
+            Console.Write("\nPlease enter your choice, or enter 'c' to cancel: ");
             var choice = Console.ReadLine();
 
-            if (Utilities.IsItAnInt(choice) == true && int.Parse(choice) <= currentCustomer.Accounts.Count)
+            if(choice.ToLower() == "c")
+            {
+                Console.Clear();
+                return;
+            }
+            else if (Utilities.IsItAnInt(choice) == true && int.Parse(choice) <= currentCustomer.Accounts.Count)
             {
                 accountChoice = int.Parse(choice) - 1;
                 Account chosenAccount = currentCustomer.Accounts[accountChoice];
@@ -284,11 +270,22 @@ namespace WDTAssignment
                 if (Utilities.IsItADouble(tempDouble) == true)
                 {
                     var depositAmount = double.Parse(tempDouble);
+                    try
+                    {
+                        Utilities.ValidateNotZeroOrNegativeAmt(depositAmount);
+                    }
+                    catch (TransactionZeroAmountException e)
+                    {
+
+                        Console.WriteLine(e.Message);
+                        return;
+                    }
                     chosenAccount.Balance += depositAmount;
                     Console.WriteLine("\n\nDepositing $" + depositAmount + " into account no. " + chosenAccount.AccountNumber + ".\n" +
                         "Account balance: $" + chosenAccount.Balance + "\n");
 
-                    chosenAccount.RecordTransaction('D', 0, "+ " + depositAmount);
+                    chosenAccount.RecordTransaction(0, 'D', 0, depositAmount);
+                    updateDB(chosenAccount);
                 }
                 else
                 {
@@ -304,26 +301,37 @@ namespace WDTAssignment
 
         public void Withdraw()
         {
-            while (WithdrawConfirmation() == true)
+            if (WithdrawConfirmation() == true)
             {
-                int accountChoice = 0;
-
+                Console.Clear();
                 Console.WriteLine("\nWhich account would you like to withdraw from?");
                 ListAccountsOptions();
-                Console.Write("\nPlease enter your choice: ");
+                Console.Write("\nPlease enter your choice, or enter 'c' to cancel: ");
                 var choice = Console.ReadLine();
 
-                if (Utilities.IsItAnInt(choice) == true && int.Parse(choice) <= currentCustomer.Accounts.Count)
+                if(choice.ToLower() == "c")
                 {
-                    accountChoice = int.Parse(choice) - 1;
+                    Console.Clear();
+                    return;
+                }
+                else if (Utilities.IsItAnInt(choice) == true && int.Parse(choice) <= currentCustomer.Accounts.Count)
+                {
+                    var accountChoice = int.Parse(choice) - 1;
                     Account chosenAccount = currentCustomer.Accounts[accountChoice];
                     WithdrawMoney(chosenAccount);
+                    updateDB(chosenAccount);
                 }
                 else
                 {
                     Console.WriteLine("Not a valid option. Please try again.");
                     Withdraw();
                 }
+            }
+            else
+            {
+                Console.WriteLine("\nYou do not agree to these terms.\n" +
+                    "Returning to Main Menu.\n");
+                return;
             }
         }
 
@@ -336,6 +344,18 @@ namespace WDTAssignment
             {
                 var withdrawalAmount = double.Parse(tempDouble);
 
+                try
+                {
+                    Utilities.ValidateNotZeroOrNegativeAmt(withdrawalAmount);
+                }
+                catch (TransactionZeroAmountException e)
+                {
+
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine("Returning to main menu.\n");
+                    return;
+                }
+
                 if (withdrawalAmount <= (chosenAccount.Balance - 0.1))
                 {
                     Console.WriteLine("\nWithdrawing $" + withdrawalAmount + " from account no. " + chosenAccount.AccountNumber + ".\n" +
@@ -343,15 +363,16 @@ namespace WDTAssignment
 
                     var deficit = (withdrawalAmount + 0.1);
                     chosenAccount.Balance -= deficit;
-                    chosenAccount.RecordTransaction('D', 0, "- " + deficit);
+                    chosenAccount.RecordTransaction(0, 'W', 0, deficit);
                     Console.WriteLine("Account balance: $" + chosenAccount.Balance);
-                    Console.WriteLine("Returning to main menu.\n\n");
+
+                    Console.WriteLine("Returning to main menu.\n");
                 }
                 else
                 {
                     Console.WriteLine("You cannot withdraw more than the balance in your account, which is $" + chosenAccount.Balance + ", not including the $0.10 withdrawal fee.\n" +
-                        "Please try again.");
-                    WithdrawMoney(chosenAccount);
+                        "Returning to main menun");
+                    return;
                 }
             }
             else
@@ -368,20 +389,18 @@ namespace WDTAssignment
                 "Do you agree to these terms? (y/n): ");
             var response = Console.ReadLine();
 
+            while(response.ToLower() != "n" && response.ToLower() != "y")
+            {
+                Console.WriteLine("\nNot a valid option. Please try again.");
+
+                Console.Write("\nWithdrawing from accounts will cost $0.10 cents.\n" +
+                    "Do you agree to these terms? (y/n): ");
+                response = Console.ReadLine();
+            }
+
             if (response.ToLower().CompareTo("y") == 0)
             {
                 confirm = true;
-            }
-            else if (response.ToLower().CompareTo("n") == 0)
-            {
-                Console.WriteLine("\nYou do not agree to these terms.\n" +
-                    "Returning to Main Menu.\n");
-                return confirm;
-            }
-            else
-            {
-                Console.WriteLine("\nNot a valid option. Please try again.");
-                WithdrawConfirmation();
             }
             return confirm;
         }
@@ -398,10 +417,15 @@ namespace WDTAssignment
             {
                 Console.WriteLine("\nWhich account would you like to transfer from?");
                 ListAccountsOptions();
-                Console.Write("\nPlease enter your choice: ");
+                Console.Write("\nPlease enter your choice, or enter 'c' to cancel: ");
                 var choice = Console.ReadLine();
 
-                if (Utilities.IsItAnInt(choice) == true && int.Parse(choice) <= currentCustomer.Accounts.Count)
+                if(choice.ToLower() == "c")
+                {
+                    Console.Clear();
+                    return;
+                }
+                else if (Utilities.IsItAnInt(choice) == true && int.Parse(choice) <= currentCustomer.Accounts.Count)
                 {
                     int accountChoice = int.Parse(choice) - 1;
                     Account chosenAccount = currentCustomer.Accounts[accountChoice];
@@ -435,9 +459,14 @@ namespace WDTAssignment
         {
             Console.WriteLine("\nWhich account would you like to transfer from?");
             ListAccountsOptions();
-            Console.Write("\nPlease enter your choice: ");
+            Console.Write("\nPlease enter your choice. or enter 'c' to cancel: ");
             var choice = Console.ReadLine();
 
+            if(choice.ToLower() == "c")
+            {
+                Console.Clear();
+                return;
+            }
             if (Utilities.IsItAnInt(choice) == true)
             {
                 int accountChoice = int.Parse(choice) - 1;
@@ -467,7 +496,7 @@ namespace WDTAssignment
 
                     if (!accountFound)
                     {
-                        Console.WriteLine("No such account exists. Returning to main menu.\n");
+                        Console.WriteLine("No such account exists. Returning to previous menu.\n");
                     }
                 }
             }
@@ -484,21 +513,39 @@ namespace WDTAssignment
 
                 if (transferAmount <= (chosenAccount.Balance - 0.2))
                 {
+                    try
+                    {
+                        Utilities.ValidateNotZeroOrNegativeAmt(transferAmount);
+                    }
+                    catch (TransactionZeroAmountException e)
+                    {
+
+                        Console.WriteLine(e.Message);
+                        Console.WriteLine("Returning to previous menu.\n");
+                        return;
+                    }
+                    Console.Clear();
                     Console.WriteLine("\nTransferring $" + transferAmount + " from account no. " + chosenAccount.AccountNumber + " to account no. " + destAccount.AccountNumber + ".\n" +
                         "Cost of transfer will be $0.20, and will be deducted from account no. " + chosenAccount.AccountNumber + ".\n");
 
+                    Console.WriteLine("\nBEFORE TRANSFER\n" +
+                        "**************************************************\n\n");
                     ListAccounts();
-
+                    
                     Console.WriteLine("\n\nTransferring money now.\n");
 
                     var deficit = (transferAmount + 0.2);
                     chosenAccount.Balance -= deficit;
                     destAccount.Balance += transferAmount;
 
-                    chosenAccount.RecordTransaction('T', destAccount.AccountNumber, "- " + deficit);
-                    destAccount.RecordTransaction('T', chosenAccount.AccountNumber, "+ " + transferAmount);
+                    chosenAccount.RecordTransaction(0, 'T', destAccount.AccountNumber, deficit);
+                    destAccount.RecordTransaction(0, 'T', chosenAccount.AccountNumber, transferAmount);
+                    updateDB(chosenAccount);
+                    updateDB(destAccount);
 
                     Console.WriteLine("Tranfer complete.\n");
+                    Console.WriteLine("\nAFTER TRANSFER\n" +
+                        "**************************************************\n\n");
                     ListAccounts();
                     Console.WriteLine();
                 }
@@ -514,24 +561,22 @@ namespace WDTAssignment
         public Boolean TransferConfirmation()
         {
             var confirm = false;
-            Console.Write("\nTransferring between accounts will cost $0.20 cents.\n" +
+            Console.Write("\nTransferring of money will cost $0.00 cents.\n" +
                 "Do you agree to these terms? (y/n): ");
             var response = Console.ReadLine();
+
+            while (response.ToLower() != "n" && response.ToLower() != "y")
+            {
+                Console.WriteLine("\nNot a valid option. Please try again.");
+
+                Console.Write("\nTransferring of money will cost $0.10 cents.\n" +
+                    "Do you agree to these terms? (y/n): ");
+                response = Console.ReadLine();
+            }
 
             if (response.ToLower().CompareTo("y") == 0)
             {
                 confirm = true;
-            }
-            else if (response.ToLower().CompareTo("n") == 0)
-            {
-                Console.WriteLine("\nYou did not agree to these terms.\n" +
-                    "Returning to Main Menu.\n");
-                return confirm;
-            }
-            else
-            {
-                Console.WriteLine("\nNot a valid option. Please try again.\n");
-                TransferConfirmation();
             }
             return confirm;
         }
@@ -540,64 +585,52 @@ namespace WDTAssignment
         {
             var chosenAccount = currentCustomer.Accounts[accountChoice];
             var transList = chosenAccount.Transactions;
-            var totalTransactions = chosenAccount.Transactions.Count;
+            double totalTransactions = chosenAccount.Transactions.Count;
             double temp = totalTransactions / 4;
-            int totalPages = (int)Math.Round(temp) * 4;
+            int totalPages = (int)Math.Ceiling(temp);
             int currentPage = 0;
-            int currentPrintedTransNo = 1;
-
-            printStatementFirstPage(totalPages, totalTransactions, transList, currentPrintedTransNo);
+            printStatementPage(chosenAccount, currentPage, totalPages, transList);
         }
 
         public void printTransaction(List<Transaction> list, int currentPrintedTransNo, int i)
         {
             Console.WriteLine("\nTransaction " + currentPrintedTransNo);
             list[i].getDetails();
-            Console.WriteLine("\n----------------------------------------");
+            Console.WriteLine("\n--------------------------------------------------");
         }
 
-        public void printStatementFirstPage(int totalPages, int totalTrans, List<Transaction> list, int currentPrintedTransNo)
+        public void printStatementPage(Account chosenAccount, int currentPage, int totalPages, List<Transaction> list)
         {
-            var printedTransCount = 0;
-            var currentPage = 1;
+            Console.Clear();
+            var printedTransNo = (list.Count - 1);
+            var printedTransCount = 1;
 
-            Console.WriteLine("\n\nPage No. " + currentPage);
-            for (int i = (totalTrans - 1); i >= 0; i--)
+            Console.WriteLine("\nAccount No. " + chosenAccount.AccountNumber);
+            for (int i = currentPage; i < totalPages; i++)
             {
-                var id = list[i].TransactionID;
-                printTransaction(list, currentPrintedTransNo, i);
-                currentPrintedTransNo++;
-                printedTransCount++;
-
-                if(printedTransCount == 4)
+                currentPage++;
+                Console.WriteLine("Statement Page No. " + currentPage + "\n" +
+                    "--------------------------------------------------");
+                if(currentPage != 1)
                 {
-                    break;
+                    printedTransCount = ((currentPage - 1) * 4) + 1;
                 }
+                for(int j = 4; j > 0; j--)
+                {
+                    printedTransNo++;
+                    var currentTransPos = list.Count - printedTransCount;
+                    printTransaction(list, printedTransCount, currentTransPos);
+                    if(printedTransCount == list.Count)
+                    {
+                        break;
+                    }
+                    printedTransCount++;
+                }
+                printStatementPageEndChoice(chosenAccount, currentPage, totalPages, list, printedTransNo);
             }
-            printStatementPageEndChoice(currentPage, totalPages, totalTrans, list, currentPrintedTransNo);
         }
 
-        public void printStatementNextCalledPage(int currentPage, int totalPages, int totalTrans, List<Transaction> list, int currentPrintedTransNo)
-        {
-            var printedTransCount = 0;
-            
-            Console.WriteLine("\n\nPage No. " + currentPage);
-            for(int i = (totalTrans - currentPrintedTransNo); i >= 0; i--)
-            {
-                var id = list[i].TransactionID;
-                printTransaction(list, currentPrintedTransNo, i);
-                currentPrintedTransNo++;
-                printedTransCount++;
-
-                if (printedTransCount == 4)
-                {
-                    break;
-                }
-            }
-            printStatementPageEndChoice(currentPage, totalPages, totalTrans, list, currentPrintedTransNo);
-        }
-
-        public void printStatementPageEndChoice(int currentPage, int totalPages, int totalTrans, List<Transaction> list, int currentPrintedTransNo)
+        public void printStatementPageEndChoice(Account chosenAccount, int currentPage, int totalPages, List<Transaction> list, int currentPrintedTransNo)
         {
             if (totalPages == 1)
             {
@@ -617,22 +650,30 @@ namespace WDTAssignment
             }
             string response = Console.ReadLine();
 
-            
-
             while (response.ToLower() != "m")
             {
-                if(response.ToLower() == "n")
+                if (response.ToLower() == "n" && currentPage == totalPages)
                 {
-                    currentPage++;
-                    printStatementNextCalledPage(currentPage, totalPages, totalTrans, list, currentPrintedTransNo);
+                    Console.WriteLine("\nERROR: Already on last page.\n" +
+                        "Please try again.\n\n");
+                    printStatementPageEndChoice(chosenAccount, currentPage, totalPages, list, currentPrintedTransNo);
+                }
+                else if (response.ToLower() == "n")
+                {
+                    printStatementPage(chosenAccount, currentPage, totalPages, list);
+                }
+                else if (response.ToLower() == "p" && currentPage == 1)
+                {
+                    Console.WriteLine("\nERROR: Already on first page.\n" +
+                        "Please try again.\n\n");
+                    printStatementPageEndChoice(chosenAccount, currentPage, totalPages, list, currentPrintedTransNo);
                 }
                 else if(response.ToLower() == "p")
                 {
-                    currentPage -= 1;
-                    currentPrintedTransNo -= 8;
+                    currentPage -= 2;
+                    printStatementPage(chosenAccount, currentPage, totalPages, list);
 
-                    printStatementNextCalledPage(currentPage, totalPages, totalTrans, list, currentPrintedTransNo);
-                } 
+                }
                 else
                 {
                     Console.WriteLine("\nInvalid option. Returning to main menu.\n");
@@ -641,29 +682,28 @@ namespace WDTAssignment
             }
             if (response.ToLower() == "m")
             {
-                Console.WriteLine("Returning to main menu.\n");
-                return;
+                MainMenu();
             }
         }
 
         public void ListAccountsOptions()
         {
             var accountCount = 1;
-            Console.WriteLine("----------------------------------------------------\n" +
-                              "| ACCOUNT NUMBER | ACCOUNT TYPE | BALANCE | OPTION |\n" +
-                              "----------------------------------------------------");
+            Console.WriteLine("------------------------------------------------------------\n" +
+                              "| OPTION | ACCOUNT NUMBER | ACCOUNT TYPE | ACCOUNT BALANCE |\n" +
+                              "------------------------------------------------------------");
             foreach (var account in currentCustomer.Accounts)
             {
-                Console.Write("  " + account.AccountNumber + "\t\t   ");
+                Console.Write("  " + accountCount + "\t   " + account.AccountNumber + "\t\t    ");
                 if (account.AccountType == 'S')
                 {
-                    Console.Write("Savings\t  ");
+                    Console.Write("Savings");
                 }
                 else
                 {
-                    Console.Write("Checking\t  ");
+                    Console.Write("Checking");
                 }
-                Console.WriteLine("$" + account.Balance + "\t    " + accountCount);
+                Console.WriteLine("\t   $" + account.Balance.ToString("#,##0.00"));
                 accountCount++;
             }
         }
@@ -671,23 +711,30 @@ namespace WDTAssignment
         public void ListAccounts()
         {
             var accountCount = 1;
-            Console.WriteLine("-------------------------------------------\n" +
-                              "| ACCOUNT NUMBER | ACCOUNT TYPE | BALANCE |\n" +
-                              "-------------------------------------------");
+            Console.WriteLine("---------------------------------------------------\n" +
+                              "| ACCOUNT NUMBER | ACCOUNT TYPE | ACCOUNT BALANCE |\n" +
+                              "---------------------------------------------------");
             foreach (var account in currentCustomer.Accounts)
             {
-                Console.Write("  " + account.AccountNumber + "\t\t   ");
+                Console.Write("  " + account.AccountNumber + "\t\t    ");
                 if (account.AccountType == 'S')
                 {
-                    Console.Write("Savings\t  ");
+                    Console.Write("Savings");
                 }
                 else
                 {
-                    Console.Write("Checking\t  ");
+                    Console.Write("Checking");
                 }
-                Console.WriteLine("$" + account.Balance);
+                Console.WriteLine("\t   $" + account.Balance.ToString("#,##0.00"));
                 accountCount++;
             }
+        }
+
+        public void updateDB(Account chosenAccount)
+        {
+            db.InsertTransaction(chosenAccount);
+            db.UpdateBalance(chosenAccount);
+            chosenAccount.Transactions[(chosenAccount.Transactions.Count - 1)].TransactionID = db.GetTransactionID();
         }
     }
 }

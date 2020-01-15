@@ -4611,11 +4611,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Ming\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj",
+      "projectUniqueName": "C:\\Users\\Ming\\source\\repos\\a1-s3739706-s3711914-master\\WDTAssignment\\WDTAssignment.csproj",
       "projectName": "WDTAssignment",
-      "projectPath": "C:\\Users\\Ming\\source\\repos\\WDTAssignment\\WDTAssignment\\WDTAssignment.csproj",
+      "projectPath": "C:\\Users\\Ming\\source\\repos\\a1-s3739706-s3711914-master\\WDTAssignment\\WDTAssignment.csproj",
       "packagesPath": "C:\\Users\\Ming\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Ming\\source\\repos\\WDTAssignment\\WDTAssignment\\obj\\",
+      "outputPath": "C:\\Users\\Ming\\source\\repos\\a1-s3739706-s3711914-master\\WDTAssignment\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Ming\\AppData\\Roaming\\NuGet\\NuGet.Config",
