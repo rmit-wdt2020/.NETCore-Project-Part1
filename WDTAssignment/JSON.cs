@@ -1,4 +1,7 @@
-﻿using System;
+﻿// References some code from lectures by Shekar Kalra
+// as well as some code from tutorials by Matthew Bolger
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Http;
@@ -6,6 +9,7 @@ using Newtonsoft.Json;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json.Converters;
 using System.Data;
+using Microsoft.Extensions.Configuration; 
 
 
 namespace WDTAssignment
@@ -17,23 +21,53 @@ namespace WDTAssignment
         public List<Account> Accounts { get; }
         public List<Transaction> Transaction { get; }
 
-        public static void PopulateDatabase()
+        private static IConfigurationRoot Configuration { get; } = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+        private static string ConnectionString { get; } = Configuration["ConnectionString"];
+
+        public void PopulateDatabase()
         {
+            SqlCommand Command = new SqlCommand();
 
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
-            ClearDatabase();
+            try
+            {
+                conn.Open();
 
-            PopulateCustomer();
-            PopulateLogin();
-            PopulateAccount();
-            PopulateTransaction();
+                // Check if the database contains any data
+                Command.Connection = conn;
+                Command.CommandText = "select count(*) from customer";
+
+                int result = int.Parse(Command.ExecuteScalar().ToString()); 
+
+                // Populate database from JSON if database is empty, else don't do anything
+                if(result == 0)
+                {
+                    PopulateCustomer();
+                    PopulateLogin();
+                    PopulateAccount();
+                    PopulateTransaction();
+                }
+
+            }
+            catch (Exception se)
+            {
+                Console.WriteLine("Exception: {0}", se.Message);
+            }
+            finally
+            {
+                if (conn.State == System.Data.ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
 
         }
 
         // Clear Database before inserting values deserialized from JSON file 
-        public static void ClearDatabase()
+        public void ClearDatabase()
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             try
             {
@@ -64,7 +98,6 @@ namespace WDTAssignment
             }
             catch (Exception se)
             {
-
                 Console.WriteLine("Exception: {0}", se.Message);
             }
             finally
@@ -77,13 +110,13 @@ namespace WDTAssignment
         }
 
         // Deserializes JSON and inserts values to Account table
-        public static void PopulateAccount()
+        public void PopulateAccount()
         {
             using var client = new HttpClient();
             var jsonAccounts = client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/customers/").Result;
             var customers = JsonConvert.DeserializeObject<List<Customer>>(jsonAccounts, new IsoDateTimeConverter { DateTimeFormat = "dd/MM/yyyy hh:mm:ss tt" });
 
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             foreach (var customer in customers)
             {
@@ -92,13 +125,12 @@ namespace WDTAssignment
                 {
                     InsertAccounts(account);
                 }
-
             }
 
         }
-        public static void InsertAccounts(Account account)
+        public void InsertAccounts(Account account)
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             try
             {
@@ -113,13 +145,10 @@ namespace WDTAssignment
                 populateAccounts.Parameters.AddWithValue("balance", account.Balance);
 
                 populateAccounts.ExecuteNonQuery();
-
             }
             catch (SqlException se)
             {
-
                 Console.WriteLine("Exception: {0}", se.Message);
-
             }
             finally
             {
@@ -132,7 +161,7 @@ namespace WDTAssignment
         }
 
         // Deserializes JSON and inserts values to Login table
-        public static void PopulateTransaction()
+        public void PopulateTransaction()
         {
             //Console.WriteLine("TEST: This method is called.");
 
@@ -142,7 +171,7 @@ namespace WDTAssignment
 
             var customers = JsonConvert.DeserializeObject<List<Customer>>(json, new IsoDateTimeConverter { DateTimeFormat = "dd/MM/yyyy hh:mm:ss tt" });
 
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             foreach (var customer in customers)
             {
@@ -150,20 +179,14 @@ namespace WDTAssignment
                 {
                     foreach (var transaction in account.Transactions)
                     {
-                        // TEST 
-                        Console.WriteLine(transaction.TransactionTimeUTC);
-
                         InsertTransactions(transaction, account);
-                        
                     }
                 }
-
             }
-
         }
-        public static void InsertTransactions(Transaction transactions, Account account)
+        public void InsertTransactions(Transaction transactions, Account account)
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             try
             {
@@ -177,13 +200,9 @@ namespace WDTAssignment
                 populateTransactions.Parameters.AddWithValue("accountNumber", account.AccountNumber);
                 populateTransactions.Parameters.AddWithValue("destinationAccountNumber", account.AccountNumber);
                 populateTransactions.Parameters.AddWithValue("amount", account.Balance);
-
-                
                 populateTransactions.Parameters.AddWithValue("transactionTimeUTC", transactions.TransactionTimeUTC);
                 
-
                 populateTransactions.ExecuteNonQuery();
-
             }
             catch (SqlException se)
             {
@@ -199,13 +218,13 @@ namespace WDTAssignment
         }
 
         // Deserializes JSON and inserts values to Login table 
-        public static void PopulateLogin()
+        public void PopulateLogin()
         {
             using var client = new HttpClient();
             var jsonLogins = client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/logins/").Result;
             var logins = JsonConvert.DeserializeObject<List<Logins>>(jsonLogins);
 
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             // Insert values to Login database 
             foreach (var login in logins)
@@ -213,9 +232,9 @@ namespace WDTAssignment
                 InsertLogin(login);
             }
         }
-        public static void InsertLogin(Logins login)
+        public void InsertLogin(Logins login)
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             try
             {
@@ -246,12 +265,11 @@ namespace WDTAssignment
         }
 
         // Deserializes JSON and inserts values to Customer table 
-        public static void PopulateCustomer()
+        public void PopulateCustomer()
         {
             using var client = new HttpClient();
 
             var jsonCustomers = client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/customers/").Result;
-
 
             var customers = JsonConvert.DeserializeObject<List<Customer>>(jsonCustomers, new IsoDateTimeConverter {DateTimeFormat = "dd/MM/yyyy hh:mm:ss tt" });
 
@@ -260,9 +278,9 @@ namespace WDTAssignment
                 InsertCustomers(customer);
             }
         }
-        public static void InsertCustomers(Customer customer)
+        public void InsertCustomers(Customer customer)
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             try
             {
@@ -303,31 +321,11 @@ namespace WDTAssignment
                 {
                     populateCustomer.Parameters.AddWithValue("postCode", customer.PostCode);
                 }
-
-                //if (customer.Address != null)
-                //{
-                //    populateCustomer.Parameters.AddWithValue("address", customer.Address);
-                //}
-                //if (customer.City != null)
-                //{
-                //    populateCustomer.Parameters.AddWithValue("city", customer.City);
-                //}
-                //if (customer.PostCode != null)
-                //{
-                //    populateCustomer.Parameters.AddWithValue("postCode", customer.PostCode);
-                //}
-
-
-
-
                 populateCustomer.ExecuteNonQuery();
-
             }
             catch (SqlException se)
             {
-
                 Console.WriteLine("Exception: {0}", se.Message);
-
             }
             finally
             {
@@ -336,9 +334,7 @@ namespace WDTAssignment
                     conn.Close();
                 }
             }
-
         }
-
     }
 }
 

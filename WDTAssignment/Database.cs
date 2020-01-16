@@ -1,13 +1,21 @@
-﻿using System;
+﻿// References some code from lectures by Shekar Kalra
+// as well as some code from tutorials by Matthew Bolger
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace WDTAssignment
 {
     class Database
+     
     {
+        private static IConfigurationRoot Configuration { get; } = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+        private static string ConnectionString { get; } = Configuration["ConnectionString"];
+
         // Get all tables in the database and map into Objects in the program 
         public void ImportDatabase()
         {
@@ -28,7 +36,7 @@ namespace WDTAssignment
         // NEED: Insert the last transaction in the List to the database Transaction table 
         public void InsertTransaction(Account account)
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             try
             {
@@ -44,16 +52,15 @@ namespace WDTAssignment
                 insertTransaction.Parameters.AddWithValue("accountNumber", account.Transactions[account.Transactions.Count - 1].AccountNumber);
                 insertTransaction.Parameters.AddWithValue("destinationAccountNumber", account.Transactions[account.Transactions.Count - 1].DestinationAccountNumber);
                 insertTransaction.Parameters.AddWithValue("amount", account.Transactions[account.Transactions.Count - 1].Amount);
-                //insertTransaction.Parameters.AddWithValue("comment", account.Transactions[account.Transactions.Count - 1].Comment);
                 insertTransaction.Parameters.AddWithValue("transactionTimeUTC", account.Transactions[account.Transactions.Count - 1].TransactionTimeUTC);
 
-                if (account.Transactions[account.Transactions.Count - 1].Comment == null)
+                if (account.Transactions[account.Transactions.Count - 1].Comment != "")
                 {
-                    insertTransaction.Parameters.AddWithValue("comment", "NULL");
+                    insertTransaction.Parameters.AddWithValue("comment", account.Transactions[account.Transactions.Count - 1].Comment);
                 }
                 else
                 {
-                    insertTransaction.Parameters.AddWithValue("comment", account.Transactions[account.Transactions.Count - 1].Comment);
+                    insertTransaction.Parameters.AddWithValue("comment", DBNull.Value);
                 }
 
                 insertTransaction.ExecuteNonQuery();
@@ -71,11 +78,10 @@ namespace WDTAssignment
             }
         }
 
-
         // NEED: Update the balance of the account being passed into this method 
         public void UpdateBalance(Account account)
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             try
             {
@@ -104,7 +110,7 @@ namespace WDTAssignment
         // NEED: Method to map Login Table into Login object in the program 
         public void DownloadLoginArray()
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             try
             {
@@ -121,8 +127,7 @@ namespace WDTAssignment
                         while (ReadLogin.Read())
                         {
                             Logins login = new Logins(ReadLogin["LoginID"].ToString(), int.Parse(ReadLogin["CustomerID"].ToString()), ReadLogin["PasswordHash"].ToString());
-                            BankingSys.Logins.Add(login);
-
+                            BankingSys.Instance().Logins.Add(login);
                         }
                     }
                 }
@@ -133,18 +138,17 @@ namespace WDTAssignment
             }
             finally
             {
-                if (conn.State == System.Data.ConnectionState.Open)
+                if (conn.State == ConnectionState.Open)
                 {
                     conn.Close();
                 }
             }
         }
 
-
         // NEED: Method to map Customer, Account and Transaction table into corresponding objects in the program 
         public void DownloadCustomerArray()
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
             try
             {
                 conn.Open();
@@ -163,22 +167,17 @@ namespace WDTAssignment
                 {
                     using (ReadCustomer = CustomerCmd.ExecuteReader())
                     {
-
                         while (ReadCustomer.Read())
                         {
-
                             Customer customer = new Customer(0, "", int.Parse(ReadCustomer["CustomerID"].ToString()), ReadCustomer["Name"].ToString(),
                                 ReadCustomer["Address"].ToString(), ReadCustomer["City"].ToString(), ReadCustomer["PostCode"].ToString());
 
-                            BankingSys.Customers.Add(customer);
+                            BankingSys.Instance().Customers.Add(customer);
                         }
-
-
                     }
-
                 }
 
-                foreach (var customer in BankingSys.Customers)
+                foreach (var customer in BankingSys.Instance().Customers)
                 {
 
                     using (LoginCmd = new SqlCommand("select loginID, passwordhash from login where customerID = " + customer.CustomerID, conn))
@@ -195,7 +194,7 @@ namespace WDTAssignment
                     }
                 }
 
-                foreach (var customer in BankingSys.Customers)
+                foreach (var customer in BankingSys.Instance().Customers)
                 {
                     using (AccountCmd = new SqlCommand("select accountnumber, accounttype, balance from account where customerID = " + customer.CustomerID, conn))
                     {
@@ -203,31 +202,37 @@ namespace WDTAssignment
                         {
                             while (ReadAccount.Read())
                             {
-                                //Console.WriteLine("\n" + ReadAccount["AccountNumber"]);
-                                Account account;
+                                Account account; 
+                                
                                 if (ReadAccount["AccountType"].ToString().Contains('S'))
                                 {
-                                    account = new SavingsAccount(int.Parse(ReadAccount["AccountNumber"].ToString()), customer.CustomerID,
-                                       double.Parse(ReadAccount["Balance"].ToString()), 0, 100, 1);
-                                }
-                                else
-                                {
-                                    account = new CheckingAccount(int.Parse(ReadAccount["AccountNumber"].ToString()), customer.CustomerID,
-                                       double.Parse(ReadAccount["Balance"].ToString()), 200, 500, 1);
-                                }
+                                    account = AccountFactory.Create('S') as SavingsAccount;
+                                    account.AccountNumber = int.Parse(ReadAccount["AccountNumber"].ToString());
+                                    account.CustomerID = customer.CustomerID;
+                                    account.Balance = double.Parse(ReadAccount["Balance"].ToString());
 
-
-                                if (customer.CustomerID == account.CustomerID)
+                                    customer.Accounts.Add(account);
+                            
+                                }
+                                else if (ReadAccount["AccountType"].ToString().Contains('C'))
                                 {
+                                    account = AccountFactory.Create('C') as CheckingAccount;
+                                    account.AccountNumber = int.Parse(ReadAccount["AccountNumber"].ToString());
+                                    account.CustomerID = customer.CustomerID;
+                                    account.Balance = double.Parse(ReadAccount["Balance"].ToString());
+
                                     customer.Accounts.Add(account);
                                 }
+
+                                    
+                                
                             }
                         }
                     }
                 }
 
 
-                foreach (var customer in BankingSys.Customers)
+                foreach (var customer in BankingSys.Instance().Customers)
                 {
                     foreach (var account in customer.Accounts)
                     {
@@ -263,7 +268,7 @@ namespace WDTAssignment
             }
             finally
             {
-                if (conn.State == System.Data.ConnectionState.Open)
+                if (conn.State == ConnectionState.Open)
                 {
                     conn.Close();
                 }
@@ -273,9 +278,9 @@ namespace WDTAssignment
         // Method to push ALL Transaction objects into database 
         public void InsertAllTransactions()
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
-            foreach (var customer in BankingSys.Customers)
+            foreach (var customer in BankingSys.Instance().Customers)
             {
                 foreach (var account in customer.Accounts)
                 {
@@ -297,7 +302,6 @@ namespace WDTAssignment
 
 
                             populateTransactions.ExecuteNonQuery();
-
                         }
                         catch (SqlException se)
                         {
@@ -305,7 +309,7 @@ namespace WDTAssignment
                         }
                         finally
                         {
-                            if (conn.State == System.Data.ConnectionState.Open)
+                            if (conn.State == ConnectionState.Open)
                             {
                                 conn.Close();
                             }
@@ -320,13 +324,13 @@ namespace WDTAssignment
         // Method to push ALL Login objects into database 
         public void InsertAllLogins()
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             try
             {
                 conn.Open();
 
-                foreach (var login in BankingSys.Logins)
+                foreach (var login in BankingSys.Instance().Logins)
                 {
                     var PopulateLogin = conn.CreateCommand();
 
@@ -340,12 +344,11 @@ namespace WDTAssignment
             }
             catch (Exception se)
             {
-
                 Console.WriteLine("Exception: {0}", se.Message);
             }
             finally
             {
-                if (conn.State == System.Data.ConnectionState.Open)
+                if (conn.State == ConnectionState.Open)
                 {
                     conn.Close();
                 }
@@ -355,13 +358,13 @@ namespace WDTAssignment
         // Method to push ALL Customer objects into database 
         public void InsertAllCustomers()
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             try
             {
                 conn.Open();
 
-                foreach (var customer in BankingSys.Customers)
+                foreach (var customer in BankingSys.Instance().Customers)
                 {
                     var PopulateCustomer = conn.CreateCommand();
 
@@ -404,12 +407,11 @@ namespace WDTAssignment
             }
             catch (Exception se)
             {
-
                 Console.WriteLine("Exception: {0}", se.Message);
             }
             finally
             {
-                if (conn.State == System.Data.ConnectionState.Open)
+                if (conn.State == ConnectionState.Open)
                 {
                     conn.Close();
                 }
@@ -419,11 +421,10 @@ namespace WDTAssignment
         // Method to push ALL Account objects into database 
         public void InsertAllAccounts()
         {
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
-            foreach (var customer in BankingSys.Customers)
+            foreach (var customer in BankingSys.Instance().Customers)
             {
-
                 foreach (var account in customer.Accounts)
                 {
                     try
@@ -443,23 +444,18 @@ namespace WDTAssignment
                     }
                     catch (SqlException se)
                     {
-
                         Console.WriteLine("Exception: {0}", se.Message);
-
                     }
                     finally
                     {
-                        if (conn.State == System.Data.ConnectionState.Open)
+                        if (conn.State == ConnectionState.Open)
                         {
                             conn.Close();
                         }
                     }
                 }
-
             }
-
         }
-
 
         public int GetTransactionID()
         {
@@ -467,7 +463,7 @@ namespace WDTAssignment
             SqlCommand getTransactionIDCmd;
             SqlDataReader readTransactionID; 
 
-            SqlConnection conn = new SqlConnection("Server = wdt2020.australiasoutheast.cloudapp.azure.com; Database = s3711914; Uid = s3711914; Password = abc123");
+            SqlConnection conn = new SqlConnection(ConnectionString);
 
             try
             {
@@ -483,22 +479,18 @@ namespace WDTAssignment
                         }
                     }
                 }
- 
             }
             catch (SqlException se)
             {
-
                 Console.WriteLine("Exception: {0}", se.Message);
-
             }
             finally
             {
-                if (conn.State == System.Data.ConnectionState.Open)
+                if (conn.State == ConnectionState.Open)
                 {
                     conn.Close();
                 }
             }
-
             return transactionID;
 
         }
