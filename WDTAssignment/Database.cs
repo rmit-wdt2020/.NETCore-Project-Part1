@@ -47,13 +47,13 @@ namespace WDTAssignment
                 //insertTransaction.Parameters.AddWithValue("comment", account.Transactions[account.Transactions.Count - 1].Comment);
                 insertTransaction.Parameters.AddWithValue("transactionTimeUTC", account.Transactions[account.Transactions.Count - 1].TransactionTimeUTC);
 
-                if (account.Transactions[account.Transactions.Count - 1].Comment == null)
+                if (account.Transactions[account.Transactions.Count - 1].Comment != "")
                 {
-                    insertTransaction.Parameters.AddWithValue("comment", "NULL");
+                    insertTransaction.Parameters.AddWithValue("comment", account.Transactions[account.Transactions.Count - 1].Comment);
                 }
                 else
                 {
-                    insertTransaction.Parameters.AddWithValue("comment", account.Transactions[account.Transactions.Count - 1].Comment);
+                    insertTransaction.Parameters.AddWithValue("comment", DBNull.Value);
                 }
 
                 insertTransaction.ExecuteNonQuery();

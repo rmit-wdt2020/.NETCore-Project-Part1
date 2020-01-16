@@ -33,5 +33,13 @@ namespace WDTAssignment
                 return false;
             }
         }
+
+        public static void ValidateNotZeroOrNegativeAmt(double amt)
+        {
+            if(amt <= 0)
+            {
+                throw new TransactionZeroAmountException("");
+            }
+        }
     }
 }

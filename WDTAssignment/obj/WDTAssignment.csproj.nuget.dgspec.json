@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\caeca\\Desktop\\a1-s3739706-s3711914-ming-branch\\WDTAssignment\\WDTAssignment.csproj": {}
+    "C:\\Users\\Ming\\source\\repos\\a1-s3739706-s3711914-master\\WDTAssignment\\WDTAssignment.csproj": {}
   },
   "projects": {
-    "C:\\Users\\caeca\\Desktop\\a1-s3739706-s3711914-ming-branch\\WDTAssignment\\WDTAssignment.csproj": {
+    "C:\\Users\\Ming\\source\\repos\\a1-s3739706-s3711914-master\\WDTAssignment\\WDTAssignment.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\caeca\\Desktop\\a1-s3739706-s3711914-ming-branch\\WDTAssignment\\WDTAssignment.csproj",
+        "projectUniqueName": "C:\\Users\\Ming\\source\\repos\\a1-s3739706-s3711914-master\\WDTAssignment\\WDTAssignment.csproj",
         "projectName": "WDTAssignment",
-        "projectPath": "C:\\Users\\caeca\\Desktop\\a1-s3739706-s3711914-ming-branch\\WDTAssignment\\WDTAssignment.csproj",
-        "packagesPath": "C:\\Users\\caeca\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\caeca\\Desktop\\a1-s3739706-s3711914-ming-branch\\WDTAssignment\\obj\\",
+        "projectPath": "C:\\Users\\Ming\\source\\repos\\a1-s3739706-s3711914-master\\WDTAssignment\\WDTAssignment.csproj",
+        "packagesPath": "C:\\Users\\Ming\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Ming\\source\\repos\\a1-s3739706-s3711914-master\\WDTAssignment\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\caeca\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Ming\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
