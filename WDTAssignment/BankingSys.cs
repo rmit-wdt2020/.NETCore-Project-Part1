@@ -6,52 +6,36 @@ using SimpleHashing;
 
 namespace WDTAssignment
 {
-    class BankingSys
+     class BankingSys
     {
-        public Database db { get; set; } = new Database();
-        public static List<Customer> Customers { get; set; } = new List<Customer>();
-        public static List<Logins> Logins { get; set; } = new List<Logins>();
+        public Database db { get; } = new Database();
+        public  List<Customer> Customers { get; set; } = new List<Customer>();
+        public  List<Logins> Logins { get; set; } = new List<Logins>();
         Customer currentCustomer;
 
-        //Test method
-        //public void TestPopulate()
-        //{
-        //    Customer cust1 = new Customer(0001, "password1", 0001, "Rio", "45 Clarke Street", "Southbank", "3006");
-        //    Customer cust2 = new Customer(0002, "Qwerty1234567", 0002, "Ming", "200 Spencer Street", "Melbourne", "3000");
 
-        //    cust1.Accounts.Add(new SavingsAccount(4100, 0001, 100, 0, 50, 0));
-        //    cust1.Accounts.Add(new CheckingAccount(4101, 0001, 500, 0, 50, 0));
+        // Implemement Singleton pattern 
+        private static  BankingSys instance; 
 
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(1, 'D', 4100, 4100, 100, "", DateTime.MinValue));
-        //    cust1.Accounts[1].Transactions.Add(new Transaction(1, 'D', 4101, 4101, 500, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(2, 'D', 4100, 4100, 100, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(3, 'D', 4100, 4100, 200, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(4, 'D', 4101, 4101, 300, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(5, 'D', 4101, 4101, 400, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(6, 'D', 4101, 4101, 500, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(7, 'D', 4101, 4101, 600, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(8, 'D', 4101, 4101, 700, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(9, 'D', 4101, 4101, 800, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(10, 'D', 4101, 4101, 900, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(11, 'D', 4101, 4101, 1000, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(12, 'D', 4101, 4101, 1100, "", DateTime.MinValue));
-        //    cust1.Accounts[0].Transactions.Add(new Transaction(13, 'D', 4101, 4101, 1200, "", DateTime.MinValue));
+        private BankingSys()
+        {
 
-        //    cust2.Accounts.Add(new SavingsAccount(4200, 0002, 900, 0, 50, 0));
-        //    cust2.Accounts.Add(new CheckingAccount(4201, 0002, 2500, 0, 50, 0));
+        }
 
-        //    cust2.Accounts[0].Transactions.Add(new Transaction(1, 'D', 4200, 4200, 900, "", DateTime.MinValue));
-        //    cust2.Accounts[1].Transactions.Add(new Transaction(1, 'D', 4201, 4201, 2500, "", DateTime.MinValue));
+        public static BankingSys Instance()
+        {
+            if (instance == null)
+            {
+                instance = new BankingSys(); 
+            }
 
-        //    Customers.Add(cust1);
-        //    Customers.Add(cust2);
-
-        //}
+            return instance;
+        }
+       
         public void Login()
         {
             Console.WriteLine();
             Console.Write("LoginID: ");
-            //var login = int.Parse(Console.ReadLine());
             var tempString = Console.ReadLine();
 
             if (Utilities.IsItAnInt(tempString))
@@ -77,7 +61,7 @@ namespace WDTAssignment
                     {
                         string password;
                         Console.WriteLine("\nEnter your password,\n" +
-                            "or 'b' to return to previous screen): ");
+                            "or 'b' to return to previous screen: ");
                         password = Console.ReadLine();
 
                         if ("b".CompareTo(password.ToLower()) == 0)

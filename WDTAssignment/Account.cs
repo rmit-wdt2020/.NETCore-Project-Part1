@@ -5,15 +5,15 @@ using System.Text;
 namespace WDTAssignment
 {
     // Account class not abstract as could not deserialize abstract classes
-    class Account
+    class Account : IAccount
     {
         public int AccountNumber { get; set; }
         public char AccountType { get; set; }
         public int CustomerID { get; set; }
         public double Balance { get; set; }
-        protected double MinBalance { get; set; }
-        protected double MinOpeningAmt { get; set; }
-        protected int TransactionCount { get; set; }
+        public double MinBalance { get; set; }
+        public double MinOpeningAmt { get; set; }
+        public int TransactionCount { get; set; }
 
         // Need to clarify if it's 4 free transactions per account or per customer
         protected const int FREE_TRANSACTIONS = 4;
@@ -25,14 +25,11 @@ namespace WDTAssignment
 
         }
 
-        protected Account(int accountnumber, int customerid, double balance, double minbalance, double minopeningamt, int transactioncount)
+        protected Account(char accounttype,  double minbalance, double minopeningamt)
         {
-            AccountNumber = accountnumber;
-            CustomerID = customerid;
-            Balance = balance;
+            AccountType = accounttype;
             MinBalance = minbalance;
             MinOpeningAmt = minopeningamt;
-            TransactionCount = transactioncount;
         }
 
         public void RecordTransaction(int transactionID, char transType, int destAcc, double transAmount)

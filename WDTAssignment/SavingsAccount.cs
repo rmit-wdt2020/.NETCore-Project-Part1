@@ -4,13 +4,13 @@ using System.Text;
 
 namespace WDTAssignment
 {
-    class SavingsAccount : Account
+    class SavingsAccount : Account, IAccount
     {
 
-        public SavingsAccount(int accountnumber, int customerid, double balance, double minbalance, double minopeningamt, int transactioncount)
-            : base(accountnumber, customerid, balance, minbalance, minopeningamt, transactioncount)
+        public SavingsAccount(char accounttype, double minbalance, double minopeningamt)
+            : base(accounttype,  minbalance,  minopeningamt)
         {
-            AccountType = 'S';
+            
         }
     }
 }

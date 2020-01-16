@@ -4,12 +4,12 @@ using System.Text;
 
 namespace WDTAssignment
 {
-    class CheckingAccount : Account
+    class CheckingAccount : Account, IAccount
     {
-        public CheckingAccount(int accountnumber, int customerid, double balance, double minbalance, double minopeningamt, int transactioncount)
-            : base(accountnumber, customerid, balance, minbalance, minopeningamt, transactioncount)
+        public CheckingAccount(char accounttype, double minbalance, double minopeningamt)
+            : base(accounttype, minbalance, minopeningamt)
         {
-            AccountType = 'C';
+            
         }
     }
 }
